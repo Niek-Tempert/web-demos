@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -20,8 +19,9 @@ const items = [
   },
   {
     title: "Rust Demo",
-    url: "/rust-demo",
+    url: "/rust",
     icon: Shrimp,
+    external: true
   },
   {
     title: "Artstation",
@@ -40,7 +40,11 @@ const items = [
           <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
               <SidebarMenuButton asChild>
-                <a :href="item.url" :target="item.external ? '_blank' : undefined">
+                <RouterLink :to="item.url" v-if="!item.external">
+                  <component :is="item.icon" />
+                  <span>{{ item.title }}</span>
+                </RouterLink>
+                <a :href="item.url" target="_blank" v-else>
                   <component :is="item.icon" />
                   <span>{{ item.title }}</span>
                 </a>
