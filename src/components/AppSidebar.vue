@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { RouterLink } from "vue-router";
 
 // Menu items.
 const items = [
