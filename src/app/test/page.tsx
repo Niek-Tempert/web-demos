@@ -1,12 +1,12 @@
 'use client'
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 function useDraggable() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e: MouseEvent) => {
     setIsDragging(true);
     dragStart.current = {
       x: e.clientX - position.x,
@@ -14,7 +14,7 @@ function useDraggable() {
     };
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
     setPosition({
       x: e.clientX - dragStart.current.x,
@@ -26,6 +26,19 @@ function useDraggable() {
     setIsDragging(false);
   };
 
+  // Attach global event listeners when dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging]);
+
   return {
     position,
     isDragging,
@@ -35,22 +48,15 @@ function useDraggable() {
         transform: `translate(${position.x}px, ${position.y}px)`,
         cursor: isDragging ? 'grabbing' : 'grab'
       }
-    },
-    // Attach these to document or a parent container
-    onMouseMove: handleMouseMove,
-    onMouseUp: handleMouseUp
+    }
   };
 }
 
-export default function Test() {
+export default function Home() {
   const draggable = useDraggable();
 
   return (
-    <div 
-      style={{ height: '100vh', background: '#4a90e2' }}
-      onMouseMove={draggable.onMouseMove}
-      onMouseUp={draggable.onMouseUp}
-    >
+    <div style={{ height: '100vh', background: '#4a90e2' }}>
       <div 
         {...draggable.dragProps}
         style={{
@@ -64,7 +70,7 @@ export default function Test() {
           userSelect: 'none'
         }}
       >
-        Drag me around!
+        Drag me around! (Even fast!)
       </div>
     </div>
   );
