@@ -87,12 +87,12 @@ export default function Home() {
         bottom: 0,
         left: 0,
         width: '100%',
-        height: '50px',
+        height: '3.7vh',
         background: '#1F1F23',
         borderTop: '1px solid #464647',
         zIndex: 1000
       }} />
-      <img style={{width: '100%', height: '100%'}} src={'./wallpaper.webp'}></img>
+      <img style={{width: '100vw'}} src={'./wallpaper.webp'}></img>
     </div>
   );
 }
