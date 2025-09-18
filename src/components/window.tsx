@@ -1,6 +1,6 @@
 'use client'
 import { useWindowManager } from '@/managers/windowmanager';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 
 function suspendIframe() {
   const iframe = document.getElementById('mygame-iframe');
@@ -23,12 +23,27 @@ interface WindowProps {
   size?: Size;
 }
 
+enum Corner {
+  None,
+  Left,
+  Right,
+  Top,
+  Bottom,
+  TopLeft,
+  BottomLeft,
+  TopRight,
+  BottomRight
+}
+
 export default function Window({
   children,
   title = "Window",
   position = { x: 100, y: 100 },
   size = { width: 1400, height: 800 }
 }: WindowProps) {
+  const windowId = useId(); // Generate unique ID for this window
+  const { bringToFront, getZIndex } = useWindowManager();
+
   const [windowPosition, setWindowPosition] = useState(position);
   const [windowSize, setWindowSize] = useState(size);
   const [isDragging, setIsDragging] = useState(false);
@@ -36,7 +51,16 @@ export default function Window({
   const dragStart = useRef({ x: 0, y: 0 });
   const resizeStart = useRef({ x: 0, y: 0 });
 
+  const getWindowCorner = () => {
+    // Find corner
+  };
+
+  const handleWindowClick = () => {
+    bringToFront(windowId);
+  };
+
   const handleDragDown = (e: React.MouseEvent) => {
+    handleWindowClick();
     setIsDragging(true);
     dragStart.current = {
       x: e.clientX - windowPosition.x,
@@ -59,8 +83,8 @@ export default function Window({
   };
 
   const handleResizeDown = (e: React.MouseEvent) => {
+    handleWindowClick();
     setIsResizing(true);
-
     resizeStart.current = {
       x: e.clientX - windowPosition.x,
       y: e.clientY - windowPosition.y
@@ -126,6 +150,7 @@ export default function Window({
           height: windowSize.height + 10,
           position: 'fixed',
           userSelect: 'none',
+          zIndex: getZIndex(windowId),
           cursor: 'crosshair',
         }}>
       </div>
@@ -137,6 +162,7 @@ export default function Window({
           height: windowSize.height,
           position: 'fixed',
           userSelect: 'none',
+          zIndex: getZIndex(windowId),
 
           background: '#1F1F23',
           border: '1px solid #464647',
