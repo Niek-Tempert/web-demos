@@ -102,7 +102,8 @@ export default function Window({
     bringToFront(windowId);
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleWindowBtn = (e: React.MouseEvent) => {
+    bringToFront(windowId);
     e.stopPropagation();
   };
 
@@ -314,7 +315,7 @@ export default function Window({
             </p>
             <div className="grid flex-grow"></div>
             <div
-              onMouseDown={handleMouseDown}
+              onMouseDown={handleWindowBtn}
               className='window-btn'
               style={{
                 width: 34,
@@ -326,7 +327,7 @@ export default function Window({
               <Minus style={{ scale: 0.6 }} />
             </div>
             <div
-              onMouseDown={handleMouseDown}
+              onMouseDown={handleWindowBtn}
               className='window-btn'
               style={{
                 width: 34,
@@ -338,7 +339,7 @@ export default function Window({
               <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />
             </div>
             <div
-              onMouseDown={handleMouseDown}
+              onMouseDown={handleWindowBtn}
               className='window-close-btn'
               style={{
                 width: 34,
