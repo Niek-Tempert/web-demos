@@ -144,3 +144,27 @@
     --sidebar-ring: oklch(0.439 0 0);
   }
 }
+
+.window-btn {
+  transition: 'background-color 0.3s ease';
+}
+
+.window-btn:hover {
+  background-color: #363639;
+}
+
+.window-btn:active {
+  background-color: #4C4C4F;
+}
+
+.window-close-btn {
+  transition: 'background-color 0.3s ease';
+}
+
+.window-close-btn:hover {
+  background-color: #E81123;
+}
+
+.window-close-btn:active {
+  background-color: #971723;
+}

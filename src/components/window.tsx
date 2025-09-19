@@ -1,5 +1,6 @@
 'use client'
 import { useWindowManager } from '@/managers/windowmanager';
+import { Copy, Minus, X } from 'lucide-react';
 import { useState, useRef, useEffect, useId } from 'react';
 
 function suspendIframe() {
@@ -101,8 +102,11 @@ export default function Window({
     bringToFront(windowId);
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const handleDragDown = (e: React.MouseEvent) => {
-    handleWindowClick();
     setIsDragging(true);
     dragStart.current = {
       x: e.clientX - currentPosition.x,
@@ -144,7 +148,7 @@ export default function Window({
 
     const minWidth = 200;
     const minHeight = 100;
-    
+
     let newSize = currentSize;
     let newPosition = currentPosition;
     if (currentCorner & Corner.Left) {
@@ -256,7 +260,7 @@ export default function Window({
 
   return (
     <div>
-      <div // Resize element
+      <div
         onMouseDown={handleResizeDown}
         style={{
           transform: `translate(${currentPosition.x - 5}px, ${currentPosition.y - 5}px)`,
@@ -268,8 +272,8 @@ export default function Window({
           cursor: getResizeCornerCursor(currentCorner),
         }}>
       </div>
-      <div // Draggable element
-        onMouseDown={handleDragDown}
+      <div
+        onMouseDown={handleWindowClick}
         style={{
           transform: `translate(${currentPosition.x}px, ${currentPosition.y}px)`,
           width: currentSize.width,
@@ -277,34 +281,71 @@ export default function Window({
           position: 'fixed',
           userSelect: 'none',
           zIndex: getZIndex(windowId),
-
-          background: '#1F1F23',
-          border: '1px solid #464647',
-          borderRadius: 10,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
         }}>
         <div
           style={{
             width: '100%',
-            height: 34,
+            height: '100%',
+            background: '#1F1F23',
+            border: '1px solid #464647',
+            borderRadius: 10,
+            overflow: 'hidden',
             display: 'flex',
-            flexShrink: 0,
+            flexDirection: 'column',
           }}>
-          <p style={{ padding: 4 }}>{title}</p>
-          <div className="grid flex-grow"></div>
-          <button style={{ width: 34, height: '100%', background: 'blue' }}></button>
-          <button style={{ width: 34, height: '100%', background: 'green' }}></button>
-          <button style={{ width: 34, height: '100%', background: 'red' }}></button>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            overflow: 'auto',
-            background: 'black',
-          }}>
-          {children}
+          <div
+            onMouseDown={handleDragDown}
+            style={{
+              width: '100%',
+              height: 34,
+              display: 'flex',
+              flexShrink: 0,
+            }}>
+            <p style={{ padding: 4 }}>{title}</p>
+            <div className="grid flex-grow"></div>
+            <div
+              onMouseDown={handleMouseDown}
+              className='window-btn'
+              style={{
+                width: 34,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+              <Minus style={{ scale: 0.6 }} />
+            </div>
+            <div
+              onMouseDown={handleMouseDown}
+              className='window-btn'
+              style={{
+                width: 34,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+              <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />
+            </div>
+            <div
+              onMouseDown={handleMouseDown}
+              className='window-close-btn'
+              style={{
+                width: 34,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}><X style={{ scale: 0.6 }} /></div>
+          </div>
+          <div
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              background: 'black',
+            }}>
+            {children}
+          </div>
         </div>
       </div>
     </div>
