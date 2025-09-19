@@ -24,15 +24,15 @@ interface WindowProps {
 }
 
 enum Corner {
-  None,
-  Left,
-  Right,
-  Top,
-  Bottom,
-  TopLeft,
-  BottomLeft,
-  TopRight,
-  BottomRight
+  None = 0,
+  Left = 1 << 0,
+  Right = 1 << 1,
+  Top = 1 << 2,
+  Bottom = 1 << 3,
+  TopLeft = Top | Left,
+  BottomLeft = Bottom | Left,
+  TopRight = Top | Right,
+  BottomRight = Bottom | Right,
 }
 
 export default function Window({
@@ -44,15 +44,57 @@ export default function Window({
   const windowId = useId(); // Generate unique ID for this window
   const { bringToFront, getZIndex } = useWindowManager();
 
-  const [windowPosition, setWindowPosition] = useState(position);
-  const [windowSize, setWindowSize] = useState(size);
+  const [currentPosition, setCurrentPosition] = useState(position);
+  const [currentSize, setCurrentSize] = useState(size);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
-  const resizeStart = useRef({ x: 0, y: 0 });
+  const resizeStartPos = useRef({ x: 0, y: 0 });
+  const resizeStartSize = useRef({ width: 0, height: 0 });
 
-  const getWindowCorner = () => {
-    // Find corner
+  const [currentCorner, setCurrentCorner] = useState(Corner.None);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // Track mouse position
+  const animationFrameRef = useRef<number>(0);
+
+  const getWindowCorner = (point: Vec2) => {
+    let corner = Corner.None;
+
+    if (point.x <= 5) {
+      corner |= Corner.Left
+    } else if (point.x >= currentSize.width - 5) {
+      corner |= Corner.Right
+    }
+
+    if (point.y <= 5) {
+      corner |= Corner.Top
+    } else if (point.y >= currentSize.height - 5) {
+      corner |= Corner.Bottom
+    }
+
+    return corner;
+  };
+
+  const getResizeCornerCursor = (corner: Corner) => {
+    switch (corner) {
+      case Corner.TopLeft:
+      case Corner.BottomRight:
+        return "nwse-resize";
+
+      case Corner.BottomLeft:
+      case Corner.TopRight:
+        return "nesw-resize";
+
+      case Corner.Left:
+      case Corner.Right:
+        return "ew-resize";
+
+      case Corner.Top:
+      case Corner.Bottom:
+        return "ns-resize";
+
+      case Corner.None:
+        return "auto";
+    }
   };
 
   const handleWindowClick = () => {
@@ -63,17 +105,17 @@ export default function Window({
     handleWindowClick();
     setIsDragging(true);
     dragStart.current = {
-      x: e.clientX - windowPosition.x,
-      y: e.clientY - windowPosition.y
+      x: e.clientX - currentPosition.x,
+      y: e.clientY - currentPosition.y,
     };
 
     suspendIframe();
   };
   const handleDragMove = (e: MouseEvent) => {
     if (!isDragging) return;
-    setWindowPosition({
+    setCurrentPosition({
       x: e.clientX - dragStart.current.x,
-      y: e.clientY - dragStart.current.y
+      y: e.clientY - dragStart.current.y,
     });
   };
   const handleDragUp = () => {
@@ -85,29 +127,50 @@ export default function Window({
   const handleResizeDown = (e: React.MouseEvent) => {
     handleWindowClick();
     setIsResizing(true);
-    resizeStart.current = {
-      x: e.clientX - windowPosition.x,
-      y: e.clientY - windowPosition.y
-    };
+    resizeStartPos.current = {
+      x: currentPosition.x,
+      y: currentPosition.y,
+    }
+    resizeStartSize.current = {
+      width: currentSize.width,
+      height: currentSize.height,
+    }
 
     suspendIframe();
   };
+
   const handleResizeMove = (e: MouseEvent) => {
     if (!isResizing) return;
 
-    // Calculate new size based on mouse position relative to window position
-    const newWidth = e.clientX - windowPosition.x;
-    const newHeight = e.clientY - windowPosition.y;
-
-    // Set minimum and maximum constraints
     const minWidth = 200;
     const minHeight = 100;
-    const maxWidth = window.innerWidth - windowPosition.x;
-    const maxHeight = window.innerHeight - windowPosition.y;
+    
+    let newSize = currentSize;
+    let newPosition = currentPosition;
+    if (currentCorner & Corner.Left) {
+      const dist = e.clientX - resizeStartPos.current.x;
+      newSize.width = Math.max(minWidth, resizeStartSize.current.width - dist);
+      newPosition.x = resizeStartPos.current.x + resizeStartSize.current.width - newSize.width;
+    } else if (currentCorner & Corner.Right) {
+      newSize.width = e.clientX - resizeStartPos.current.x;
+    }
 
-    setWindowSize({
-      width: Math.max(minWidth, Math.min(maxWidth, newWidth)),
-      height: Math.max(minHeight, Math.min(maxHeight, newHeight))
+    if (currentCorner & Corner.Top) {
+      const dist = e.clientY - resizeStartPos.current.y;
+      newSize.height = Math.max(minHeight, resizeStartSize.current.height - dist);
+      newPosition.y = resizeStartPos.current.y + resizeStartSize.current.height - newSize.height;
+    } else if (currentCorner & Corner.Bottom) {
+      newSize.height = e.clientY - resizeStartPos.current.y;
+    }
+
+    setCurrentPosition({
+      x: newPosition.x,
+      y: newPosition.y
+    });
+
+    setCurrentSize({
+      width: Math.max(minWidth, newSize.width),
+      height: Math.max(minHeight, newSize.height)
     });
   };
   const handleResizeUp = () => {
@@ -115,6 +178,57 @@ export default function Window({
 
     resumeIframe();
   };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateCursor = () => {
+      if (!isResizing && !isDragging) {
+        // Calculate mouse position relative to window
+        const relativeMousePos = {
+          x: mousePosition.x - currentPosition.x,
+          y: mousePosition.y - currentPosition.y
+        };
+
+        // Check if mouse is within resize area (5px border around window)
+        const resizeAreaPos = {
+          x: relativeMousePos.x + 5, // Account for the -5px offset of resize element
+          y: relativeMousePos.y + 5
+        };
+
+        // Only update cursor if mouse is within the resize area
+        if (resizeAreaPos.x >= 0 && resizeAreaPos.x <= currentSize.width + 10 &&
+          resizeAreaPos.y >= 0 && resizeAreaPos.y <= currentSize.height + 10) {
+
+          const newCorner = getWindowCorner(relativeMousePos);
+
+          if (newCorner !== currentCorner) {
+            setCurrentCorner(newCorner);
+          }
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(updateCursor);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(updateCursor);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [currentPosition, currentSize, mousePosition, currentCorner, isResizing, isDragging]);
 
   useEffect(() => {
     if (isDragging) {
@@ -145,21 +259,21 @@ export default function Window({
       <div // Resize element
         onMouseDown={handleResizeDown}
         style={{
-          transform: `translate(${windowPosition.x - 5}px, ${windowPosition.y - 5}px)`,
-          width: windowSize.width + 10,
-          height: windowSize.height + 10,
+          transform: `translate(${currentPosition.x - 5}px, ${currentPosition.y - 5}px)`,
+          width: currentSize.width + 10,
+          height: currentSize.height + 10,
           position: 'fixed',
           userSelect: 'none',
           zIndex: getZIndex(windowId),
-          cursor: 'crosshair',
+          cursor: getResizeCornerCursor(currentCorner),
         }}>
       </div>
       <div // Draggable element
         onMouseDown={handleDragDown}
         style={{
-          transform: `translate(${windowPosition.x}px, ${windowPosition.y}px)`,
-          width: windowSize.width,
-          height: windowSize.height,
+          transform: `translate(${currentPosition.x}px, ${currentPosition.y}px)`,
+          width: currentSize.width,
+          height: currentSize.height,
           position: 'fixed',
           userSelect: 'none',
           zIndex: getZIndex(windowId),
