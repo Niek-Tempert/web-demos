@@ -11,12 +11,15 @@ export default function Taskbar() {
             zIndex: 10000,
             fontSize: '2vh',
             textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
         }}>
-            🚪
-            🌽
-            🥜
-            ✨
-            💋
+            <div className="taskbar-btn">🚪</div>
+            <div className="taskbar-btn">🌽</div>
+            <div className="taskbar-btn">🥜</div>
+            <div className="taskbar-btn">✨</div>
+            <div className="taskbar-btn">💋</div>
         </div>
     );
 };

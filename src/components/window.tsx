@@ -21,7 +21,7 @@ interface WindowProps {
   children?: React.ReactNode;
   title?: string;
   position?: Vec2;
-  size?: Size;
+  size?: { width: any, height: any};
 }
 
 enum Corner {
@@ -301,7 +301,17 @@ export default function Window({
               display: 'flex',
               flexShrink: 0,
             }}>
-            <p style={{ padding: 4 }}>{title}</p>
+            <p 
+            style={{ 
+              padding: 4, 
+              fontSize: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingLeft: 10,
+              }}>
+              {title}
+            </p>
             <div className="grid flex-grow"></div>
             <div
               onMouseDown={handleMouseDown}
@@ -311,7 +321,7 @@ export default function Window({
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}>
               <Minus style={{ scale: 0.6 }} />
             </div>
@@ -323,7 +333,7 @@ export default function Window({
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}>
               <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />
             </div>
@@ -335,7 +345,7 @@ export default function Window({
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
               }}><X style={{ scale: 0.6 }} /></div>
           </div>
           <div
