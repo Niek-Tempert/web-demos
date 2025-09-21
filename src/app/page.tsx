@@ -1,6 +1,6 @@
 import Taskbar from '@/components/taskbar';
 import Window from '@/components/window';
-import { WindowManager } from '@/managers/windowmanager';
+import { WindowManager } from '@/components/window-manager';
 
 export default function Page() {
   return (
