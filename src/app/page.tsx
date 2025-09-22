@@ -13,7 +13,7 @@ export default function Page() {
             </Window>
         </WindowManager>
         <Taskbar/>
-        <Image style={{ width: '100vw' }} src={'./wallpaper.webp'} alt={"Background"} />
+        <img style={{ width: '100vw' }} src={'./wallpaper.webp'} alt={"Background"} />
     </div>
   );
 }

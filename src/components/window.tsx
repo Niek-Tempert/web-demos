@@ -1,6 +1,6 @@
 'use client'
 import { useWindowManager } from '@/managers/windowmanager';
-import { Size, Vec2 } from '@/Types/vector';
+import { Size, Vec2 } from '@/Types/Vector';
 import { Copy, Minus, X } from 'lucide-react';
 import { useState, useRef, useEffect, useId, useCallback } from 'react';
 
