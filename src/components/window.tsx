@@ -1,7 +1,8 @@
 'use client'
 import { useWindowManager } from '@/managers/windowmanager';
+import { Size, Vec2 } from '@/Types/vector';
 import { Copy, Minus, X } from 'lucide-react';
-import { useState, useRef, useEffect, useId } from 'react';
+import { useState, useRef, useEffect, useId, useCallback } from 'react';
 
 function suspendIframe() {
   const iframe = document.getElementById('mygame-iframe');
@@ -21,7 +22,7 @@ interface WindowProps {
   children?: React.ReactNode;
   title?: string;
   position?: Vec2;
-  size?: { width: any, height: any};
+  size?: Size;
 }
 
 enum Corner {
@@ -57,7 +58,7 @@ export default function Window({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // Track mouse position
   const animationFrameRef = useRef<number>(0);
 
-  const getWindowCorner = (point: Vec2) => {
+  const getWindowCorner = useCallback((point: Vec2) => {
     let corner = Corner.None;
 
     if (point.x <= 5) {
@@ -73,7 +74,7 @@ export default function Window({
     }
 
     return corner;
-  };
+  }, [currentSize]);
 
   const getResizeCornerCursor = (corner: Corner) => {
     switch (corner) {
@@ -116,20 +117,20 @@ export default function Window({
 
     suspendIframe();
   };
-  const handleDragMove = (e: MouseEvent) => {
+  const handleDragMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return;
     setCurrentPosition({
       x: e.clientX - dragStart.current.x,
       y: e.clientY - dragStart.current.y,
     });
-  };
-  const handleDragUp = () => {
+  }, [isDragging]);
+  const handleDragUp = useCallback(() => {
     setIsDragging(false);
 
     resumeIframe();
-  };
+  }, []);
 
-  const handleResizeDown = (e: React.MouseEvent) => {
+  const handleResizeDown = () => {
     handleWindowClick();
     setIsResizing(true);
     resizeStartPos.current = {
@@ -144,14 +145,14 @@ export default function Window({
     suspendIframe();
   };
 
-  const handleResizeMove = (e: MouseEvent) => {
+  const handleResizeMove = useCallback((e: MouseEvent) => {
     if (!isResizing) return;
 
     const minWidth = 200;
     const minHeight = 100;
 
-    let newSize = currentSize;
-    let newPosition = currentPosition;
+    const newSize = currentSize;
+    const newPosition = currentPosition;
     if (currentCorner & Corner.Left) {
       const dist = e.clientX - resizeStartPos.current.x;
       newSize.width = Math.max(minWidth, resizeStartSize.current.width - dist);
@@ -177,12 +178,12 @@ export default function Window({
       width: Math.max(minWidth, newSize.width),
       height: Math.max(minHeight, newSize.height)
     });
-  };
-  const handleResizeUp = () => {
+  }, [currentCorner, currentPosition, currentSize, isResizing]);
+  const handleResizeUp = useCallback(() => {
     setIsResizing(false);
 
     resumeIframe();
-  };
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -233,7 +234,7 @@ export default function Window({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [currentPosition, currentSize, mousePosition, currentCorner, isResizing, isDragging]);
+  }, [currentPosition, currentSize, mousePosition, currentCorner, isResizing, isDragging, getWindowCorner]);
 
   useEffect(() => {
     if (isDragging) {
@@ -245,7 +246,7 @@ export default function Window({
         document.removeEventListener('mouseup', handleDragUp);
       };
     }
-  }, [isDragging]);
+  }, [isDragging, handleDragMove, handleDragUp]);
 
   useEffect(() => {
     if (isResizing) {
@@ -257,7 +258,7 @@ export default function Window({
         document.removeEventListener('mouseup', handleResizeUp);
       };
     }
-  }, [isResizing]);
+  }, [isResizing, handleResizeMove, handleResizeUp]);
 
   return (
     <div>

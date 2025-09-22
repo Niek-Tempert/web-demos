@@ -1,6 +1,7 @@
 import Taskbar from '@/components/taskbar';
 import Window from '@/components/window';
 import { WindowManager } from '@/managers/windowmanager';
+import Image from 'next/image';
 
 export default function Page() {
   return (
@@ -12,7 +13,7 @@ export default function Page() {
             </Window>
         </WindowManager>
         <Taskbar/>
-        <img style={{width: '100vw'}} src={'./wallpaper.webp'}></img>
+        <Image style={{ width: '100vw' }} src={'./wallpaper.webp'} alt={"Background"} />
     </div>
   );
 }

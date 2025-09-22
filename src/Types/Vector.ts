@@ -1,9 +1,9 @@
-interface Vec2 {
+export interface Vec2 {
   x: number;
   y: number;
 }
 
-interface Size {
+export interface Size {
   width: number;
   height: number;
 }
