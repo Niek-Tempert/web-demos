@@ -1,11 +1,10 @@
 import Taskbar from '@/components/taskbar';
 import Window from '@/components/window';
-import { WindowManager } from '@/managers/windowmanager';
-import Image from 'next/image';
+import { WindowManager } from '@/components/window-manager';
 
 export default function Page() {
   return (
-    <div style={{ overflow: 'hidden', height: '100vh', width: '100vw' }}>
+    <div id='page' style={{ overflow: 'hidden', height: '100vh', width: '100vw' }}>
         <WindowManager>
             <Window title='Empty' position={{x: 100, y: 100}}/>
             <Window title='SpaceGame' position={{x: 1000, y: 400}}>
