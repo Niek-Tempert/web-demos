@@ -25,35 +25,45 @@ export default function Window({
 
   const handleWindowClick = () => {
     bringToFront(windowId);
+    console.log(getZIndex(windowId));
   };
 
   return (
-    <MovableResizeable
-      position={position}
-      size={size}
-      minSize={{ width: 200, height: 100 }}
-      dragRef={titleBarRef}>
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: '#1F1F23',
-          border: '1px solid #464647',
-          borderRadius: 10,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-        <WindowTitleBar ref={titleBarRef} title={title} />
+    <div
+      onMouseDown={handleWindowClick}
+      style={{
+        zIndex: getZIndex(windowId),
+        position: 'fixed',
+      }}>
+      <MovableResizeable
+        position={position}
+        size={size}
+        minSize={{ width: 200, height: 100 }}
+        dragRef={titleBarRef}>
         <div
           style={{
-            flex: 1,
-            overflow: 'auto',
-            background: 'black',
+            width: '100%',
+            height: '100%',
+            background: '#1F1F23',
+            border: '1px solid #464647',
+            borderRadius: 10,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           }}>
-          {children}
+          <WindowTitleBar
+            ref={titleBarRef}
+            title={title} />
+          <div
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              background: 'black',
+            }}>
+            {children}
+          </div>
         </div>
-      </div>
-    </MovableResizeable>
+      </MovableResizeable>
+    </div>
   );
 }

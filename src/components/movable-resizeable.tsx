@@ -1,11 +1,11 @@
 'use client';
 import { Size, Vec2 } from "@/Types/Vector";
-import { Corner, MovableProps, ResizeableProps, ResizeableState } from "@/Types/Props";
+import { Corner, MovableProps, MovableResizeableProps, MovableResizeableState } from "@/Types/Props";
 import React from "react";
 import Movable from "./movable";
 
-export default class MovableResizeable extends React.Component<ResizeableProps, ResizeableState> {
-    state: ResizeableState = {
+export default class MovableResizeable extends React.Component<MovableResizeableProps, MovableResizeableState> {
+    state: MovableResizeableState = {
         position: this.props.position || Vec2.Zero,
         size: this.props.size || Size.Zero,
         isResizing: false,
@@ -125,7 +125,7 @@ export default class MovableResizeable extends React.Component<ResizeableProps, 
         }
     }
 
-    componentDidUpdate(prevProps: ResizeableProps, prevState: ResizeableState) {
+    componentDidUpdate(prevProps: MovableResizeableProps, prevState: MovableResizeableState) {
         if (prevState.isResizing !== this.state.isResizing) {
             if (this.state.isResizing) {
                 document.addEventListener('mousemove', this.handleResizeMove);
@@ -173,7 +173,6 @@ export default class MovableResizeable extends React.Component<ResizeableProps, 
                         position: 'fixed',
                         userSelect: 'none',
                         cursor: this.getResizeCornerCursor(this.state.selectedCorner),
-                        background: 'red',
                     }}>
                 </div>
                 <Movable

@@ -14,12 +14,12 @@ export interface MovableState {
     dragStart: Vec2;
 }
 
-export interface ResizeableProps extends MovableProps {
+export interface MovableResizeableProps extends MovableProps {
     size?: Size,
     minSize?: Size,
 }
 
-export interface ResizeableState {
+export interface MovableResizeableState {
     position: Vec2,
     size: Size,
     isResizing: boolean,
