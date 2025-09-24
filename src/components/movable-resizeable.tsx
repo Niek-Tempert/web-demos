@@ -66,8 +66,8 @@ export default class MovableResizeable extends React.Component<MovableResizeable
     handleResizeMove = (e: MouseEvent) => {
         if (!this.state.isResizing) return;
 
-        let newSize = structuredClone(this.state.size);
-        let newPosition = structuredClone(this.state.position);
+        const newSize = structuredClone(this.state.size);
+        const newPosition = structuredClone(this.state.position);
         if (this.state.selectedCorner & Corner.Left) {
             const dist = e.clientX - this.state.resizeStartPos.x;
             newSize.width = this.state.resizeStartSize.width - dist;

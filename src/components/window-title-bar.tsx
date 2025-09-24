@@ -2,21 +2,15 @@ import { Minus, Copy, X } from "lucide-react";
 import { RefObject } from "react";
 
 interface WindowTitleBarProps {
-    title?: string, 
+    title?: string,
     ref?: RefObject<HTMLDivElement | null>,
 }
 
 export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBarProps) {
 
-    const handleWindowBtn = (e: React.MouseEvent) => {
-        // bringToFront(windowId);
-        e.stopPropagation();
-    };
-
     return (
         <div
             ref={ref}
-            // onMouseDown={handleDragDown}
             style={{
                 width: '100%',
                 height: 34,
@@ -36,7 +30,6 @@ export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBar
             </p>
             <div className="grid flex-grow"></div>
             <div
-                onMouseDown={handleWindowBtn}
                 className='window-btn'
                 style={{
                     width: 34,
@@ -48,7 +41,6 @@ export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBar
                 <Minus style={{ scale: 0.6 }} />
             </div>
             <div
-                onMouseDown={handleWindowBtn}
                 className='window-btn'
                 style={{
                     width: 34,
@@ -60,7 +52,6 @@ export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBar
                 <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />
             </div>
             <div
-                onMouseDown={handleWindowBtn}
                 className='window-close-btn'
                 style={{
                     width: 34,

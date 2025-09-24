@@ -25,7 +25,6 @@ export default function Window({
 
   const handleWindowClick = () => {
     bringToFront(windowId);
-    console.log(getZIndex(windowId));
   };
 
   return (

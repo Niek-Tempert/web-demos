@@ -32,7 +32,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
 
         this.props.onMove?.(e, newPosition);
     };
-    handleDragUp = (e: MouseEvent) => {
+    handleDragUp = () => {
         this.setState({
             isDragging: false,
         });
