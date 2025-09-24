@@ -89,8 +89,6 @@ export default class Movable extends React.Component<MovableProps, MovableState>
                     transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`,
                     position: 'fixed',
                     userSelect: 'none',
-                    width: this.props.size?.width ?? undefined,
-                    height: this.props.size?.height ?? undefined,
                 }}>
                 {this.props.children}
             </div>

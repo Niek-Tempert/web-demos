@@ -4,7 +4,6 @@ import { Size, Vec2 } from "./Vector";
 export interface MovableProps {
     children?: React.ReactNode;
     position?: Vec2;
-    size?: Size
     dragRef?: RefObject<HTMLDivElement | null>;
     onMove?: (e: MouseEvent, position: Vec2) => void;
 }

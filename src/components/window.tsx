@@ -3,7 +3,6 @@ import { useWindowManager } from '@/components/window-manager';
 import { Size, Vec2 } from '@/Types/Vector';
 import { useId, useRef } from 'react';
 import WindowTitleBar from './window-title-bar';
-import Movable from './movable';
 import MovableResizeable from './movable-resizeable';
 
 interface WindowProps {
@@ -17,7 +16,7 @@ export default function Window({
   children,
   title = "Window",
   position = { x: 100, y: 100 },
-  size = { width: 1400, height: 800 }
+  size = { width: 1000, height: 600 }
 }: WindowProps) {
   const windowId = useId();
   const { bringToFront, getZIndex } = useWindowManager();
@@ -31,7 +30,7 @@ export default function Window({
   return (
     <MovableResizeable
       position={position}
-      size={{ width: 200, height: 100 }}
+      size={size}
       minSize={{ width: 200, height: 100 }}
       dragRef={titleBarRef}>
       <div
