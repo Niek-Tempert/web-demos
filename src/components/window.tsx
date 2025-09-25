@@ -1,7 +1,7 @@
 'use client'
 import { useWindowManager } from '@/components/window-manager';
 import { Size, Vec2 } from '@/Types/Vector';
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import WindowTitleBar from './window-title-bar';
 import MovableResizeable from './movable-resizeable';
 
@@ -20,6 +20,10 @@ export default function Window({
 }: WindowProps) {
   const windowId = useId();
   const { bringToFront, getZIndex } = useWindowManager();
+  const [currentPosition, setCurrentPosition] = useState(position);
+  const [currentSize, setCurrentSize] = useState(size);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const titleBarRef = useRef<HTMLDivElement>(null);
 
@@ -27,16 +31,39 @@ export default function Window({
     bringToFront(windowId);
   };
 
+  const onMove = (e: MouseEvent, position: Vec2) => {
+    if (isMaximized) return;
+    setCurrentPosition(position);
+  }
+
+  const onResize = (e: MouseEvent, size: Size) => {
+    if (isMaximized) return;
+    setCurrentSize(size);
+  }
+
+  const onMaximize = () => {
+    setIsMaximized(!isMaximized);
+  }
+
+  const onHide = () => {
+    setIsOpen(false);
+  }
+
   return (
     <div
       onMouseDown={handleWindowClick}
       style={{
         zIndex: getZIndex(windowId),
         position: 'fixed',
+        visibility: !isOpen ? 'hidden' : undefined,
       }}>
       <MovableResizeable
-        position={position}
-        size={size}
+        canDrag={!isMaximized}
+        canResize={!isMaximized}
+        onMove={onMove}
+        onResize={onResize}
+        position={!isMaximized ? currentPosition : Vec2.Zero}
+        size={!isMaximized ? currentSize : { width: innerWidth, height: innerHeight }}
         minSize={{ width: 200, height: 100 }}
         dragRef={titleBarRef}>
         <div
@@ -45,12 +72,15 @@ export default function Window({
             height: '100%',
             background: '#1F1F23',
             border: '1px solid #464647',
-            borderRadius: 10,
+            borderRadius: !isMaximized ? 10 : 0,
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
           }}>
           <WindowTitleBar
+            onMinimize={onHide}
+            onMaximize={onMaximize}
+            onClose={onHide}
             ref={titleBarRef}
             title={title} />
           <div

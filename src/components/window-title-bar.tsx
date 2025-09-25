@@ -2,11 +2,20 @@ import { Minus, Copy, X } from "lucide-react";
 import { RefObject } from "react";
 
 interface WindowTitleBarProps {
-    title?: string,
-    ref?: RefObject<HTMLDivElement | null>,
+    title?: string;
+    ref?: RefObject<HTMLDivElement | null>;
+    onMinimize?: () => void;
+    onMaximize?: () => void;
+    onClose?: () => void;
 }
 
-export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBarProps) {
+export default function WindowTitleBar({
+    title = "Window",
+    ref,
+    onMinimize,
+    onMaximize,
+    onClose,
+}: WindowTitleBarProps) {
 
     return (
         <div
@@ -31,6 +40,7 @@ export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBar
             <div className="grid flex-grow"></div>
             <div
                 className='window-btn'
+                onClick={onMinimize}
                 style={{
                     width: 34,
                     height: '100%',
@@ -42,6 +52,7 @@ export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBar
             </div>
             <div
                 className='window-btn'
+                onClick={onMaximize}
                 style={{
                     width: 34,
                     height: '100%',
@@ -53,6 +64,7 @@ export default function WindowTitleBar({ title = "Window", ref }: WindowTitleBar
             </div>
             <div
                 className='window-close-btn'
+                onClick={onClose}
                 style={{
                     width: 34,
                     height: '100%',

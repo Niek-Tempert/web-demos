@@ -5,6 +5,7 @@ export interface MovableProps {
     children?: React.ReactNode;
     position?: Vec2;
     dragRef?: RefObject<HTMLDivElement | null>;
+    canDrag?: boolean;
     onMove?: (e: MouseEvent, position: Vec2) => void;
 }
 
@@ -15,17 +16,20 @@ export interface MovableState {
 }
 
 export interface MovableResizeableProps extends MovableProps {
-    size?: Size,
-    minSize?: Size,
+    size?: Size;
+    minSize?: Size;
+    canResize?: boolean;
+    onResize?: (e: MouseEvent, size: Size) => void;
 }
 
 export interface MovableResizeableState {
-    position: Vec2,
-    size: Size,
-    isResizing: boolean,
-    resizeStartPos: Vec2,
-    resizeStartSize: Size,
-    selectedCorner: Corner,
+    position: Vec2;
+    size: Size;
+    isResizing: boolean;
+    resizeStartPos: Vec2;
+    resizeStartSize: Size;
+    selectedCorner: Corner;
+    currentCursor: string; // TODO: Remove later
 }
 
 export enum Corner {

@@ -11,6 +11,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
     };
 
     handleDragDown = (e: React.MouseEvent | MouseEvent) => {
+        if (this.props.canDrag === false) return;
         this.setState({
             isDragging: true,
             dragStart: {
@@ -18,6 +19,11 @@ export default class Movable extends React.Component<MovableProps, MovableState>
                 y: e.clientY - this.state.position.y,
             },
         });
+
+        const iframes = document.getElementsByTagName("iframe")
+        for (let iframe of iframes) {
+            iframe.style.pointerEvents = 'none';
+        }
     };
     handleDragMove = (e: MouseEvent) => {
         if (!this.state.isDragging) return;
@@ -36,6 +42,11 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         this.setState({
             isDragging: false,
         });
+
+        const iframes = document.getElementsByTagName("iframe")
+        for (let iframe of iframes) {
+            iframe.style.pointerEvents = 'auto';
+        }
     };
 
     componentDidMount(): void {
@@ -45,9 +56,10 @@ export default class Movable extends React.Component<MovableProps, MovableState>
     }
 
     componentDidUpdate(prevProps: MovableProps, prevState: MovableState) {
-        if (prevProps.position !== this.props.position &&
-            this.props.position &&
-            !this.state.isDragging) {
+        if (this.props.position
+            && (prevProps.position?.x !== this.props.position.x
+                || prevProps.position?.y !== this.props.position.y)
+            && !this.state.isDragging) {
             this.setState({
                 position: this.props.position
             });

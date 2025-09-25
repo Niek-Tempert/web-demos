@@ -5,7 +5,7 @@ export default function Taskbar() {
             bottom: 0,
             left: 0,
             width: '100%',
-            height: '3.7vh',
+            height: '4vh',
             background: '#1F1F23',
             borderTop: '1px solid #464647',
             zIndex: 10000,
