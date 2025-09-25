@@ -75,7 +75,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         });
 
         const iframes = document.getElementsByTagName("iframe")
-        for (let iframe of iframes) {
+        for (const iframe of iframes) {
             iframe.style.pointerEvents = 'none';
         }
     };
@@ -129,7 +129,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         });
 
         const iframes = document.getElementsByTagName("iframe")
-        for (let iframe of iframes) {
+        for (const iframe of iframes) {
             iframe.style.pointerEvents = 'auto';
         }
     };

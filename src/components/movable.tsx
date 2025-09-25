@@ -21,7 +21,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         });
 
         const iframes = document.getElementsByTagName("iframe")
-        for (let iframe of iframes) {
+        for (const iframe of iframes) {
             iframe.style.pointerEvents = 'none';
         }
     };
@@ -44,7 +44,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         });
 
         const iframes = document.getElementsByTagName("iframe")
-        for (let iframe of iframes) {
+        for (const iframe of iframes) {
             iframe.style.pointerEvents = 'auto';
         }
     };
