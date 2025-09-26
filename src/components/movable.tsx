@@ -10,7 +10,11 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         dragStart: Vec2.Zero,
     };
 
-    handleDragDown = (e: React.PointerEvent | PointerEvent) => {
+    handleDragDownReact = (e: React.PointerEvent) => {
+        this.handleDragDown(e.nativeEvent);
+    }
+
+    handleDragDown = (e: PointerEvent) => {
         if (this.props.canDrag === false) return;
         this.setState({
             isDragging: true,
@@ -20,10 +24,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
             },
         });
 
-        const iframes = document.getElementsByTagName("iframe")
-        for (const iframe of iframes) {
-            iframe.style.pointerEvents = 'none';
-        }
+        this.props.onMoveStart?.(e);
     };
     handleDragMove = (e: PointerEvent) => {
         if (!this.state.isDragging) return;
@@ -38,15 +39,12 @@ export default class Movable extends React.Component<MovableProps, MovableState>
 
         this.props.onMove?.(e, newPosition);
     };
-    handleDragUp = () => {
+    handleDragUp = (e: PointerEvent) => {
         this.setState({
             isDragging: false,
         });
 
-        const iframes = document.getElementsByTagName("iframe")
-        for (const iframe of iframes) {
-            iframe.style.pointerEvents = 'auto';
-        }
+        this.props.onMoveEnd?.(e);
     };
 
     componentDidMount(): void {
@@ -96,7 +94,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
     render(): React.ReactNode {
         return (
             <div
-                onPointerDown={!this.props.dragRef ? this.handleDragDown : undefined}
+                onPointerDown={!this.props.dragRef ? this.handleDragDownReact : undefined}
                 style={{
                     transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`,
                     position: 'fixed',

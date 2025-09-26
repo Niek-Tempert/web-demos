@@ -67,10 +67,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             e.target.setPointerCapture(e.pointerId);
         }
 
-        const iframes = document.getElementsByTagName("iframe")
-        for (const iframe of iframes) {
-            iframe.style.pointerEvents = 'none';
-        }
+        this.props.onResizeStart?.(e.nativeEvent);
     };
 
     handleResizeMove = (e: PointerEvent) => {
@@ -125,12 +122,9 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             e.target.releasePointerCapture(e.pointerId);
         }
 
-        const iframes = document.getElementsByTagName("iframe")
-        for (const iframe of iframes) {
-            iframe.style.pointerEvents = 'auto';
-        }
+        this.props.onResizeEnd?.(e);
     };
-    handleMouseMove = (e: React.MouseEvent) => {
+    handleMouseMove = (e: React.PointerEvent) => {
         if (this.state.isResizing) return;
         const relativeMousePos = {
             x: e.clientX - this.state.position.x,
@@ -160,7 +154,6 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             && (prevProps.size?.width !== this.props.size.width
                 || prevProps.size?.height !== this.props.size.height)
             && !this.state.isResizing) {
-            // debugger;
             this.setState({
                 size: this.props.size
             });
@@ -182,7 +175,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         document.removeEventListener('pointerup', this.handleResizeUp);
     }
 
-    onMove = (e: MouseEvent, position: Vec2) => {
+    onMove = (e: PointerEvent, position: Vec2) => {
         this.setState({
             position: position,
         })

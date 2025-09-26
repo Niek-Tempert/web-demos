@@ -31,12 +31,12 @@ export default function Window({
     bringToFront(windowId);
   };
 
-  const onMove = (e: MouseEvent, position: Vec2) => {
+  const onMove = (e: PointerEvent, position: Vec2) => {
     if (isMaximized) return;
     setCurrentPosition(position);
   }
 
-  const onResize = (e: MouseEvent, size: Size) => {
+  const onResize = (e: PointerEvent, size: Size) => {
     if (isMaximized) return;
     setCurrentSize(size);
   }
@@ -47,6 +47,20 @@ export default function Window({
 
   const onHide = () => {
     setIsOpen(false);
+  }
+
+  const suspendIframe = () => {
+    const iframes = document.getElementsByTagName("iframe")
+    for (const iframe of iframes) {
+      iframe.style.pointerEvents = 'none';
+    }
+  }
+
+  const resumeIframe = () => {
+    const iframes = document.getElementsByTagName("iframe")
+    for (const iframe of iframes) {
+      iframe.style.pointerEvents = 'auto';
+    }
   }
 
   return (
@@ -62,6 +76,10 @@ export default function Window({
         canResize={!isMaximized}
         onMove={onMove}
         onResize={onResize}
+        onMoveStart={suspendIframe}
+        onResizeStart={suspendIframe}
+        onMoveEnd={resumeIframe}
+        onResizeEnd={resumeIframe}
         position={!isMaximized ? currentPosition : Vec2.Zero}
         size={!isMaximized ? currentSize : { width: innerWidth, height: innerHeight }}
         minSize={{ width: 200, height: 100 }}
