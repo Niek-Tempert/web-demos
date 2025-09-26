@@ -1,9 +1,11 @@
 'use client';
 import { MovableProps, MovableState } from "@/Types/Props";
 import { Vec2 } from "@/Types/Vector";
-import React from "react";
+import React, { createRef, RefObject } from "react";
 
 export default class Movable extends React.Component<MovableProps, MovableState> {
+    captureElement: RefObject<HTMLDivElement | null> = createRef();
+
     state: MovableState = {
         position: this.props.position || Vec2.Zero,
         isDragging: false,
@@ -24,6 +26,9 @@ export default class Movable extends React.Component<MovableProps, MovableState>
             },
         });
 
+        const refElem = this.props.dragRef ?? this.captureElement;
+        refElem.current?.setPointerCapture(e.pointerId);
+
         this.props.onMoveStart?.(e);
     };
     handleDragMove = (e: PointerEvent) => {
@@ -43,6 +48,9 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         this.setState({
             isDragging: false,
         });
+
+        const refElem = this.props.dragRef ?? this.captureElement;
+        refElem.current?.releasePointerCapture(e.pointerId);
 
         this.props.onMoveEnd?.(e);
     };
@@ -94,6 +102,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
     render(): React.ReactNode {
         return (
             <div
+                ref={this.captureElement}
                 onPointerDown={!this.props.dragRef ? this.handleDragDownReact : undefined}
                 style={{
                     transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`,

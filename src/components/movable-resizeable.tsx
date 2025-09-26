@@ -1,10 +1,12 @@
 'use client';
 import { Size, Vec2 } from "@/Types/Vector";
 import { Corner, MovableProps, MovableResizeableProps, MovableResizeableState } from "@/Types/Props";
-import React from "react";
+import React, { createRef, RefObject } from "react";
 import Movable from "./movable";
 
 export default class MovableResizeable extends React.Component<MovableResizeableProps, MovableResizeableState> {
+    captureElement: RefObject<HTMLDivElement | null> = createRef();
+
     state: MovableResizeableState = {
         position: this.props.position || Vec2.Zero,
         size: this.props.size || Size.Zero,
@@ -63,9 +65,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             resizeStartSize: this.state.size,
         });
 
-        if (e.target instanceof Element) {
-            e.target.setPointerCapture(e.pointerId);
-        }
+        this.captureElement.current?.setPointerCapture(e.pointerId);
 
         this.props.onResizeStart?.(e.nativeEvent);
     };
@@ -118,9 +118,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             isResizing: false,
         });
 
-        if (e.target instanceof Element) {
-            e.target.releasePointerCapture(e.pointerId);
-        }
+        this.captureElement.current?.releasePointerCapture(e.pointerId);
 
         this.props.onResizeEnd?.(e);
     };
@@ -185,6 +183,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         return (
             <div>
                 <div
+                    ref={this.captureElement}
                     onPointerDown={this.handleResizeDown}
                     onPointerMove={this.handleMouseMove}
                     style={{
