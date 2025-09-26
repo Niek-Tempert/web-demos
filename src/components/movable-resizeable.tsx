@@ -1,7 +1,7 @@
 'use client';
 import { Size, Vec2 } from "@/Types/Vector";
 import { Corner, MovableProps, MovableResizeableProps, MovableResizeableState } from "@/Types/Props";
-import React, { useRef } from "react";
+import React from "react";
 import Movable from "./movable";
 
 export default class MovableResizeable extends React.Component<MovableResizeableProps, MovableResizeableState> {

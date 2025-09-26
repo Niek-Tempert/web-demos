@@ -10,7 +10,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         dragStart: Vec2.Zero,
     };
 
-    handleDragDown = (e: React.MouseEvent | MouseEvent) => {
+    handleDragDown = (e: React.PointerEvent | PointerEvent) => {
         if (this.props.canDrag === false) return;
         this.setState({
             isDragging: true,
@@ -25,7 +25,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
             iframe.style.pointerEvents = 'none';
         }
     };
-    handleDragMove = (e: MouseEvent) => {
+    handleDragMove = (e: PointerEvent) => {
         if (!this.state.isDragging) return;
 
         const newPosition = {
@@ -51,7 +51,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
 
     componentDidMount(): void {
         if (this.props.dragRef?.current) {
-            this.props.dragRef.current.addEventListener('mousedown', this.handleDragDown);
+            this.props.dragRef.current.addEventListener('pointerdown', this.handleDragDown);
         }
     }
 
@@ -67,36 +67,36 @@ export default class Movable extends React.Component<MovableProps, MovableState>
 
         if (prevState.isDragging !== this.state.isDragging) {
             if (this.state.isDragging) {
-                document.addEventListener('mousemove', this.handleDragMove);
-                document.addEventListener('mouseup', this.handleDragUp);
+                document.addEventListener('pointermove', this.handleDragMove);
+                document.addEventListener('pointerup', this.handleDragUp);
             } else {
-                document.removeEventListener('mousemove', this.handleDragMove);
-                document.removeEventListener('mouseup', this.handleDragUp);
+                document.removeEventListener('pointermove', this.handleDragMove);
+                document.removeEventListener('pointerup', this.handleDragUp);
             }
         }
 
         if (prevProps.dragRef !== this.props.dragRef) {
             if (prevProps.dragRef?.current) {
-                prevProps.dragRef.current.removeEventListener('mousedown', this.handleDragDown);
+                prevProps.dragRef.current.removeEventListener('pointerdown', this.handleDragDown);
             }
             if (this.props.dragRef?.current) {
-                this.props.dragRef.current.addEventListener('mousedown', this.handleDragDown);
+                this.props.dragRef.current.addEventListener('pointerdown', this.handleDragDown);
             }
         }
     }
 
     componentWillUnmount() {
-        document.removeEventListener('mousemove', this.handleDragMove);
-        document.removeEventListener('mouseup', this.handleDragUp);
+        document.removeEventListener('pointermove', this.handleDragMove);
+        document.removeEventListener('pointerup', this.handleDragUp);
         if (this.props.dragRef?.current) {
-            this.props.dragRef.current.removeEventListener('mousedown', this.handleDragDown);
+            this.props.dragRef.current.removeEventListener('pointerdown', this.handleDragDown);
         }
     }
 
     render(): React.ReactNode {
         return (
             <div
-                onMouseDown={!this.props.dragRef ? this.handleDragDown : undefined}
+                onPointerDown={!this.props.dragRef ? this.handleDragDown : undefined}
                 style={{
                     transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`,
                     position: 'fixed',
