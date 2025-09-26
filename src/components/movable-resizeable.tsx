@@ -63,8 +63,9 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             resizeStartSize: this.state.size,
         });
 
-        const target = (e.target as Element);
-        target.setPointerCapture(e.pointerId);
+        if (e.target instanceof Element) {
+            e.target.setPointerCapture(e.pointerId);
+        }
 
         const iframes = document.getElementsByTagName("iframe")
         for (const iframe of iframes) {
@@ -120,8 +121,9 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             isResizing: false,
         });
 
-        const target = (e.target as Element);
-        target.releasePointerCapture(e.pointerId);
+        if (e.target instanceof Element) {
+            e.target.releasePointerCapture(e.pointerId);
+        }
 
         const iframes = document.getElementsByTagName("iframe")
         for (const iframe of iframes) {
