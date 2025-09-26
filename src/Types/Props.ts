@@ -29,7 +29,6 @@ export interface MovableResizeableState {
     resizeStartPos: Vec2;
     resizeStartSize: Size;
     selectedCorner: Corner;
-    currentCursor: string; // TODO: Remove later
 }
 
 export enum Corner {

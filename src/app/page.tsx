@@ -4,7 +4,7 @@ import { WindowManager } from '@/components/window-manager';
 
 export default function Page() {
   return (
-    <div id='page' style={{ overflow: 'hidden', height: '100vh', width: '100vw' }}>
+    <div style={{ overflow: 'hidden', height: '100vh', width: '100vw' }}>
       <WindowManager>
         <Window title='Empty' position={{ x: 100, y: 50 }} />
         <Window title='SpaceGame' position={{ x: 800, y: 300 }}>

@@ -1,7 +1,7 @@
 'use client';
 import { Size, Vec2 } from "@/Types/Vector";
 import { Corner, MovableProps, MovableResizeableProps, MovableResizeableState } from "@/Types/Props";
-import React from "react";
+import React, { useRef } from "react";
 import Movable from "./movable";
 
 export default class MovableResizeable extends React.Component<MovableResizeableProps, MovableResizeableState> {
@@ -12,7 +12,6 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         resizeStartPos: Vec2.Zero,
         resizeStartSize: Size.Zero,
         selectedCorner: Corner.None,
-        currentCursor: "auto",
     }
 
     getWindowCorner = (point: Vec2) => {
@@ -32,16 +31,6 @@ export default class MovableResizeable extends React.Component<MovableResizeable
 
         return corner;
     };
-
-    getHackyResizeCornerCursor = (corner: Corner) => {
-        // TODO: Find proper implementation
-        const page = document.getElementById('page')
-        if (page && page.style.cursor in ["nwse-resize", "nesw-resize", "ew-resize", "ns-resize"]) {
-            return "inherit"
-        }
-
-        return this.getResizeCornerCursor(corner);
-    }
 
     getResizeCornerCursor = (corner: Corner) => {
         switch (corner) {
@@ -66,7 +55,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         }
     };
 
-    handleResizeDown = () => {
+    handleResizeDown = (e: React.PointerEvent) => {
         if (this.props.canResize === false) return;
         this.setState({
             isResizing: true,
@@ -74,13 +63,16 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             resizeStartSize: this.state.size,
         });
 
+        const target = (e.target as Element);
+        target.setPointerCapture(e.pointerId);
+
         const iframes = document.getElementsByTagName("iframe")
         for (const iframe of iframes) {
             iframe.style.pointerEvents = 'none';
         }
     };
 
-    handleResizeMove = (e: MouseEvent) => {
+    handleResizeMove = (e: PointerEvent) => {
         if (!this.state.isResizing) return;
 
         const newSize = structuredClone(this.state.size);
@@ -123,10 +115,13 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         this.props.onMove?.(e, newPosition);
         this.props.onResize?.(e, newSize);
     };
-    handleResizeUp = () => {
+    handleResizeUp = (e: PointerEvent) => {
         this.setState({
             isResizing: false,
         });
+
+        const target = (e.target as Element);
+        target.releasePointerCapture(e.pointerId);
 
         const iframes = document.getElementsByTagName("iframe")
         for (const iframe of iframes) {
@@ -134,19 +129,18 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         }
     };
     handleMouseMove = (e: React.MouseEvent) => {
-        if (!this.state.isResizing) {
-            const relativeMousePos = {
-                x: e.clientX - this.state.position.x,
-                y: e.clientY - this.state.position.y
-            };
+        if (this.state.isResizing) return;
+        const relativeMousePos = {
+            x: e.clientX - this.state.position.x,
+            y: e.clientY - this.state.position.y
+        };
 
-            const newCorner = this.getWindowCorner(relativeMousePos);
+        const newCorner = this.getWindowCorner(relativeMousePos);
 
-            if (newCorner !== this.state.selectedCorner) {
-                this.setState({
-                    selectedCorner: newCorner,
-                });
-            }
+        if (newCorner !== this.state.selectedCorner) {
+            this.setState({
+                selectedCorner: newCorner,
+            });
         }
     }
 
@@ -172,36 +166,18 @@ export default class MovableResizeable extends React.Component<MovableResizeable
 
         if (prevState.isResizing !== this.state.isResizing) {
             if (this.state.isResizing) {
-                document.addEventListener('mousemove', this.handleResizeMove);
-                document.addEventListener('mouseup', this.handleResizeUp);
-                const page = document.getElementById('page');
-                if (page) {
-                    page.style.cursor = this.getResizeCornerCursor(this.state.selectedCorner);
-                }
+                document.addEventListener('pointermove', this.handleResizeMove);
+                document.addEventListener('pointerup', this.handleResizeUp);
             } else {
-                document.removeEventListener('mousemove', this.handleResizeMove);
-                document.removeEventListener('mouseup', this.handleResizeUp);
-                const page = document.getElementById('page')
-                if (page) {
-                    page.style.cursor = "auto";
-                }
+                document.removeEventListener('pointermove', this.handleResizeMove);
+                document.removeEventListener('pointerup', this.handleResizeUp);
             }
-        }
-
-        if (prevState.selectedCorner !== this.state.selectedCorner) {
-            this.setState({
-                currentCursor: this.getHackyResizeCornerCursor(this.state.selectedCorner),
-            });
         }
     }
 
     componentWillUnmount() {
-        document.removeEventListener('mousemove', this.handleResizeMove);
-        document.removeEventListener('mouseup', this.handleResizeUp);
-        const page = document.getElementById('page')
-        if (page) {
-            page.style.cursor = "auto";
-        }
+        document.removeEventListener('pointermove', this.handleResizeMove);
+        document.removeEventListener('pointerup', this.handleResizeUp);
     }
 
     onMove = (e: MouseEvent, position: Vec2) => {
@@ -214,15 +190,15 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         return (
             <div>
                 <div
-                    onMouseDown={this.handleResizeDown}
-                    onMouseMove={this.handleMouseMove}
+                    onPointerDown={this.handleResizeDown}
+                    onPointerMove={this.handleMouseMove}
                     style={{
                         transform: `translate(${(this.state.position.x) - 5}px, ${(this.state.position.y) - 5}px)`,
                         width: this.state.size.width + 10,
                         height: this.state.size.height + 10,
                         position: 'fixed',
                         userSelect: 'none',
-                        cursor: this.state.currentCursor,
+                        cursor: this.getResizeCornerCursor(this.state.selectedCorner),
                     }}>
                 </div>
                 <Movable
