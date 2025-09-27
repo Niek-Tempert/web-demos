@@ -1,22 +1,20 @@
 'use client';
 import { MovableProps, MovableState } from "@/Types/Props";
 import { Vec2 } from "@/Types/Vector";
-import React, { createRef, RefObject } from "react";
+import React from "react";
 
 export default class Movable extends React.Component<MovableProps, MovableState> {
-    captureElement: RefObject<HTMLDivElement | null> = createRef();
-
     state: MovableState = {
         position: this.props.position || Vec2.Zero,
         isDragging: false,
         dragStart: Vec2.Zero,
     };
 
-    handleDragDownReact = (e: React.PointerEvent) => {
+    handleDragDownReact = (e: React.MouseEvent) => {
         this.handleDragDown(e.nativeEvent);
     }
 
-    handleDragDown = (e: PointerEvent) => {
+    handleDragDown = (e: MouseEvent) => {
         if (this.props.canDrag === false) return;
         this.setState({
             isDragging: true,
@@ -26,12 +24,9 @@ export default class Movable extends React.Component<MovableProps, MovableState>
             },
         });
 
-        const refElem = this.props.dragRef ?? this.captureElement;
-        refElem.current?.setPointerCapture(e.pointerId);
-
         this.props.onMoveStart?.(e);
     };
-    handleDragMove = (e: PointerEvent) => {
+    handleDragMove = (e: MouseEvent) => {
         if (!this.state.isDragging) return;
 
         const newPosition = {
@@ -44,28 +39,24 @@ export default class Movable extends React.Component<MovableProps, MovableState>
 
         this.props.onMove?.(e, newPosition);
     };
-    handleDragUp = (e: PointerEvent) => {
+    handleDragUp = (e: MouseEvent) => {
         this.setState({
             isDragging: false,
         });
-
-        const refElem = this.props.dragRef ?? this.captureElement;
-        refElem.current?.releasePointerCapture(e.pointerId);
 
         this.props.onMoveEnd?.(e);
     };
 
     componentDidMount(): void {
         if (this.props.dragRef?.current) {
-            this.props.dragRef.current.addEventListener('pointerdown', this.handleDragDown);
+            this.props.dragRef.current.addEventListener('mousedown', this.handleDragDown);
         }
     }
 
     componentDidUpdate(prevProps: MovableProps, prevState: MovableState) {
         if (this.props.position
-            && (prevProps.position?.x !== this.props.position.x
-                || prevProps.position?.y !== this.props.position.y)
-            && !this.state.isDragging) {
+            && (!prevProps.position
+                || !Vec2.Equals(prevProps.position, this.props.position))) {
             this.setState({
                 position: this.props.position
             });
@@ -73,37 +64,34 @@ export default class Movable extends React.Component<MovableProps, MovableState>
 
         if (prevState.isDragging !== this.state.isDragging) {
             if (this.state.isDragging) {
-                document.addEventListener('pointermove', this.handleDragMove);
-                document.addEventListener('pointerup', this.handleDragUp);
+                document.addEventListener('mousemove', this.handleDragMove);
+                document.addEventListener('mouseup', this.handleDragUp);
             } else {
-                document.removeEventListener('pointermove', this.handleDragMove);
-                document.removeEventListener('pointerup', this.handleDragUp);
+                document.removeEventListener('mousemove', this.handleDragMove);
+                document.removeEventListener('mouseup', this.handleDragUp);
             }
         }
 
         if (prevProps.dragRef !== this.props.dragRef) {
             if (prevProps.dragRef?.current) {
-                prevProps.dragRef.current.removeEventListener('pointerdown', this.handleDragDown);
+                prevProps.dragRef.current.removeEventListener('mousedown', this.handleDragDown);
             }
             if (this.props.dragRef?.current) {
-                this.props.dragRef.current.addEventListener('pointerdown', this.handleDragDown);
+                this.props.dragRef.current.addEventListener('mousedown', this.handleDragDown);
             }
         }
     }
 
     componentWillUnmount() {
-        document.removeEventListener('pointermove', this.handleDragMove);
-        document.removeEventListener('pointerup', this.handleDragUp);
         if (this.props.dragRef?.current) {
-            this.props.dragRef.current.removeEventListener('pointerdown', this.handleDragDown);
+            this.props.dragRef.current.removeEventListener('mousedown', this.handleDragDown);
         }
     }
 
     render(): React.ReactNode {
         return (
             <div
-                ref={this.captureElement}
-                onPointerDown={!this.props.dragRef ? this.handleDragDownReact : undefined}
+                onMouseDown={!this.props.dragRef?.current ? this.handleDragDownReact : undefined}
                 style={{
                     transform: `translate(${this.state.position.x}px, ${this.state.position.y}px)`,
                     position: 'fixed',

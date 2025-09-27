@@ -4,9 +4,9 @@ import { RefObject } from "react";
 interface WindowTitleBarProps {
     title?: string;
     ref?: RefObject<HTMLDivElement | null>;
-    onMinimize?: () => void;
-    onMaximize?: () => void;
-    onClose?: () => void;
+    onMinimize?: (e: React.MouseEvent) => void;
+    onMaximize?: (e: React.MouseEvent) => void;
+    onClose?: (e: React.MouseEvent) => void;
 }
 
 export default function WindowTitleBar({

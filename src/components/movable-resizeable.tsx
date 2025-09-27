@@ -5,7 +5,7 @@ import React, { createRef, RefObject } from "react";
 import Movable from "./movable";
 
 export default class MovableResizeable extends React.Component<MovableResizeableProps, MovableResizeableState> {
-    captureElement: RefObject<HTMLDivElement | null> = createRef();
+    resizeRef: RefObject<HTMLDivElement | null> = createRef();
 
     state: MovableResizeableState = {
         position: this.props.position || Vec2.Zero,
@@ -18,16 +18,17 @@ export default class MovableResizeable extends React.Component<MovableResizeable
 
     getWindowCorner = (point: Vec2) => {
         let corner = Corner.None;
+        const resize_width = 10;
 
-        if (point.x <= 5) {
+        if (point.x <= resize_width) {
             corner |= Corner.Left
-        } else if (point.x >= this.state.size.width - 5) {
+        } else if (point.x >= this.state.size.width - resize_width) {
             corner |= Corner.Right
         }
 
-        if (point.y <= 5) {
+        if (point.y <= resize_width) {
             corner |= Corner.Top
-        } else if (point.y >= this.state.size.height - 5) {
+        } else if (point.y >= this.state.size.height - resize_width) {
             corner |= Corner.Bottom
         }
 
@@ -65,7 +66,8 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             resizeStartSize: this.state.size,
         });
 
-        this.captureElement.current?.setPointerCapture(e.pointerId);
+        this.resizeRef.current?.addEventListener('pointermove', this.handleResizeMove);
+        this.resizeRef.current?.setPointerCapture(e.pointerId);
 
         this.props.onResizeStart?.(e.nativeEvent);
     };
@@ -113,16 +115,17 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         this.props.onMove?.(e, newPosition);
         this.props.onResize?.(e, newSize);
     };
-    handleResizeUp = (e: PointerEvent) => {
+    handleResizeUp = (e: React.PointerEvent) => {
         this.setState({
             isResizing: false,
         });
 
-        this.captureElement.current?.releasePointerCapture(e.pointerId);
+        this.resizeRef.current?.removeEventListener('pointermove', this.handleResizeMove);
+        this.resizeRef.current?.releasePointerCapture(e.pointerId);
 
-        this.props.onResizeEnd?.(e);
+        this.props.onResizeEnd?.(e.nativeEvent);
     };
-    handleMouseMove = (e: React.PointerEvent) => {
+    handleMouseMove = (e: React.MouseEvent) => {
         if (this.state.isResizing) return;
         const relativeMousePos = {
             x: e.clientX - this.state.position.x,
@@ -140,40 +143,23 @@ export default class MovableResizeable extends React.Component<MovableResizeable
 
     componentDidUpdate(prevProps: MovableResizeableProps, prevState: MovableResizeableState) {
         if (this.props.position
-            && (prevProps.position?.x !== this.props.position.x
-                || prevProps.position?.y !== this.props.position.y)
-            && !this.state.isResizing) {
+            && (!prevProps.position
+                || !Vec2.Equals(prevProps.position, this.props.position))) {
             this.setState({
                 position: this.props.position
             });
         }
 
         if (this.props.size
-            && (prevProps.size?.width !== this.props.size.width
-                || prevProps.size?.height !== this.props.size.height)
-            && !this.state.isResizing) {
+            && (!prevProps.size
+                || !Size.Equals(prevProps.size, this.props.size))) {
             this.setState({
                 size: this.props.size
             });
         }
-
-        if (prevState.isResizing !== this.state.isResizing) {
-            if (this.state.isResizing) {
-                document.addEventListener('pointermove', this.handleResizeMove);
-                document.addEventListener('pointerup', this.handleResizeUp);
-            } else {
-                document.removeEventListener('pointermove', this.handleResizeMove);
-                document.removeEventListener('pointerup', this.handleResizeUp);
-            }
-        }
     }
 
-    componentWillUnmount() {
-        document.removeEventListener('pointermove', this.handleResizeMove);
-        document.removeEventListener('pointerup', this.handleResizeUp);
-    }
-
-    onMove = (e: PointerEvent, position: Vec2) => {
+    onMove = (e: MouseEvent, position: Vec2) => {
         this.setState({
             position: position,
         })
@@ -183,9 +169,10 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         return (
             <div>
                 <div
-                    ref={this.captureElement}
+                    ref={this.resizeRef}
                     onPointerDown={this.handleResizeDown}
-                    onPointerMove={this.handleMouseMove}
+                    onPointerUp={this.handleResizeUp}
+                    onMouseMove={this.handleMouseMove}
                     style={{
                         transform: `translate(${(this.state.position.x) - 5}px, ${(this.state.position.y) - 5}px)`,
                         width: this.state.size.width + 10,

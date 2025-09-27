@@ -6,9 +6,9 @@ export interface MovableProps {
     position?: Vec2;
     dragRef?: RefObject<HTMLDivElement | null>;
     canDrag?: boolean;
-    onMove?: (e: PointerEvent, position: Vec2) => void;
-    onMoveStart?: (e: PointerEvent) => void;
-    onMoveEnd?: (e: PointerEvent) => void;
+    onMove?: (e: MouseEvent, position: Vec2) => void;
+    onMoveStart?: (e: MouseEvent) => void;
+    onMoveEnd?: (e: MouseEvent) => void;
 }
 
 export interface MovableState {

@@ -41,13 +41,17 @@ export default function Window({
     setCurrentSize(size);
   }
 
-  const onMaximize = () => {
+  const onMaximize = (e: React.MouseEvent) => {
     setIsMaximized(!isMaximized);
-  }
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
-  const onHide = () => {
+  const onHide = (e: React.MouseEvent) => {
     setIsOpen(false);
-  }
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const suspendIframe = () => {
     const iframes = document.getElementsByTagName("iframe")
