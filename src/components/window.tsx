@@ -31,7 +31,7 @@ export default function Window({
     bringToFront(windowId);
   };
 
-  const onMove = (e: PointerEvent, position: Vec2) => {
+  const onMove = (e: MouseEvent, position: Vec2) => {
     if (isMaximized) return;
     setCurrentPosition(position);
   }
