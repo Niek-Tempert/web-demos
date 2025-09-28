@@ -1,29 +1,39 @@
 'use client'
-import { useWindowManager } from '@/components/window-manager';
+import { useWindowManager } from '@/components/os/window/window-manager';
 import { Size, Vec2 } from '@/Types/Vector';
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import WindowTitleBar from './window-title-bar';
-import MovableResizeable from './movable-resizeable';
+import MovableResizeable from '../../movable/movable-resizeable';
+
+type ExternalCallback<T> = [T, (value: T) => void];
 
 interface WindowProps {
   children?: React.ReactNode;
   title?: string;
   position?: Vec2;
   size?: Size;
+  visibilityCallback?: ExternalCallback<boolean>;
 }
 
 export default function Window({
   children,
   title = "Window",
   position = { x: 100, y: 100 },
-  size = { width: 1000, height: 600 }
+  size = { width: 1000, height: 600 },
+  visibilityCallback = [true, () => {}]
 }: WindowProps) {
   const windowId = useId();
   const { bringToFront, getZIndex } = useWindowManager();
   const [currentPosition, setCurrentPosition] = useState(position);
   const [currentSize, setCurrentSize] = useState(size);
   const [isMaximized, setIsMaximized] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  
+  const [isVisible, setIsVisible] = visibilityCallback;
+  const [setStateIsOpen, setStateIsVisible] = useState(isVisible);
+
+  useEffect(() => {
+    setStateIsVisible(isVisible);
+  }, [isVisible, setStateIsVisible])
 
   const titleBarRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +58,8 @@ export default function Window({
   };
 
   const onHide = (e: React.MouseEvent) => {
-    setIsOpen(false);
+    setStateIsVisible(false);
+    setIsVisible?.(false);
     e.preventDefault();
     e.stopPropagation();
   };
@@ -73,7 +84,7 @@ export default function Window({
       style={{
         zIndex: getZIndex(windowId),
         position: 'fixed',
-        visibility: !isOpen ? 'hidden' : undefined,
+        visibility: !setStateIsOpen ? 'hidden' : undefined,
       }}>
       <MovableResizeable
         canDrag={!isMaximized}

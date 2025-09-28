@@ -28,12 +28,11 @@ export default function WindowTitleBar({
             }}>
             <p
                 style={{
-                    padding: 4,
                     fontSize: 16,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    paddingLeft: 10,
+                    paddingLeft: 4,
                 }}>
                 {title}
             </p>
