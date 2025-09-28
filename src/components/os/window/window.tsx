@@ -1,11 +1,10 @@
 'use client'
 import { useWindowManager } from '@/components/os/window/window-manager';
 import { Size, Vec2 } from '@/Types/Vector';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import WindowTitleBar from './window-title-bar';
 import MovableResizeable from '../../movable/movable-resizeable';
-
-type ExternalCallback<T> = [T, (value: T) => void];
+import { ExternalCallback, useExternal } from '@/Types/Hooks';
 
 interface WindowProps {
   children?: React.ReactNode;
@@ -20,20 +19,15 @@ export default function Window({
   title = "Window",
   position = { x: 100, y: 100 },
   size = { width: 1000, height: 600 },
-  visibilityCallback = [true, () => {}]
+  visibilityCallback = [true, () => { }]
 }: WindowProps) {
   const windowId = useId();
   const { bringToFront, getZIndex } = useWindowManager();
   const [currentPosition, setCurrentPosition] = useState(position);
   const [currentSize, setCurrentSize] = useState(size);
   const [isMaximized, setIsMaximized] = useState(false);
-  
-  const [isVisible, setIsVisible] = visibilityCallback;
-  const [setStateIsOpen, setStateIsVisible] = useState(isVisible);
 
-  useEffect(() => {
-    setStateIsVisible(isVisible);
-  }, [isVisible, setStateIsVisible])
+  const [isVisible, setIsVisible] = useExternal(visibilityCallback);
 
   const titleBarRef = useRef<HTMLDivElement>(null);
 
@@ -58,8 +52,7 @@ export default function Window({
   };
 
   const onHide = (e: React.MouseEvent) => {
-    setStateIsVisible(false);
-    setIsVisible?.(false);
+    setIsVisible(false);
     e.preventDefault();
     e.stopPropagation();
   };
@@ -84,7 +77,7 @@ export default function Window({
       style={{
         zIndex: getZIndex(windowId),
         position: 'fixed',
-        visibility: !setStateIsOpen ? 'hidden' : undefined,
+        visibility: !isVisible ? 'hidden' : undefined,
       }}>
       <MovableResizeable
         canDrag={!isMaximized}
