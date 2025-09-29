@@ -1,17 +1,18 @@
 import SpaceGame from "./apps/spacegame";
 import { useWindowManager } from "./window/window-manager";
-import Window from "./window/window";
 import Empty from "./apps/empty";
 import Form from "./apps/form";
+import { useCallback } from "react";
 
 export default function Desktop() {
-    const { startWindow, focusWindow } = useWindowManager();
+    const { startWindow, bringToFront } = useWindowManager();
 
-    const handleStartWindow = (e: React.MouseEvent, content: React.ReactNode) => {
+    const handleStartWindow = useCallback((e: React.MouseEvent, content: React.ReactNode) => {
         if (!(e.target instanceof HTMLElement)) return;
 
         const windowID = e.target.getAttribute('w-id');
-        if (!windowID) {
+        const windowIndex = parseInt(windowID ?? "");
+        if (isNaN(windowIndex)) {
             const windowIndex = startWindow({
                 children: content
             });
@@ -20,18 +21,15 @@ export default function Desktop() {
             return;
         }
 
-        const windowIndex = parseInt(windowID);
-        if (!windowIndex) return;
-
-        focusWindow(windowIndex);
-    };
+        bringToFront(windowIndex);
+    }, [startWindow, bringToFront]);
 
     return (
         <>
             <div className="absolute bottom-0 w-full h-10 bg-[#1F1F23] border-t border-[#464647] z-[10000] text-center flex items-center justify-center text-xl">
-                <button onClick={(e: React.MouseEvent) => handleStartWindow(e, <Empty></Empty>)} className="taskbar-btn">🚪</button>
-                <button onClick={(e: React.MouseEvent) => handleStartWindow(e, <SpaceGame />)} className="taskbar-btn">🚀</button>
-                <button onClick={(e: React.MouseEvent) => handleStartWindow(e, <Form></Form>)} className="taskbar-btn">📄</button>
+                <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Empty />)}>🚪</button>
+                <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <SpaceGame />)}>🚀</button>
+                <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Form />)}>📄</button>
             </div>
             <img
                 draggable={false}

@@ -1,13 +1,14 @@
 'use client'
 import { useWindowManager } from '@/components/os/window/window-manager';
 import { Size, Vec2 } from '@/Types/Vector';
-import { useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import WindowTitleBar from './window-title-bar';
 import MovableResizeable from '../../movable/movable-resizeable';
 import { ExternalCallback, useExternal } from '@/Types/Hooks';
 
 interface WindowProps {
   children?: React.ReactNode;
+  id: number;
   title?: string;
   position?: Vec2;
   size?: Size;
@@ -16,12 +17,13 @@ interface WindowProps {
 
 export default function Window({
   children,
+  id,
   title = "Window",
   position = { x: 100, y: 100 },
   size = { width: 1000, height: 600 },
   visibilityCallback = [true, () => { }]
 }: WindowProps) {
-  const windowId = useId();
+  const windowId = useRef(id);
   const { bringToFront, getZIndex } = useWindowManager();
   const [currentPosition, setCurrentPosition] = useState(position);
   const [currentSize, setCurrentSize] = useState(size);
@@ -31,51 +33,51 @@ export default function Window({
 
   const titleBarRef = useRef<HTMLDivElement>(null);
 
-  const handleWindowClick = () => {
-    bringToFront(windowId);
-  };
+  const handleWindowClick = useCallback(() => {
+    bringToFront(windowId.current);
+  }, [bringToFront]);
 
-  const onMove = (e: MouseEvent, position: Vec2) => {
+  const onMove = useCallback((e: MouseEvent, position: Vec2) => {
     if (isMaximized) return;
     setCurrentPosition(position);
-  }
+  }, [isMaximized]);
 
-  const onResize = (e: PointerEvent, size: Size) => {
+  const onResize = useCallback((e: PointerEvent, size: Size) => {
     if (isMaximized) return;
     setCurrentSize(size);
-  }
+  }, [isMaximized]);
 
-  const onMaximize = (e: React.MouseEvent) => {
+  const onMaximize = useCallback((e: React.MouseEvent) => {
     setIsMaximized(!isMaximized);
     e.preventDefault();
     e.stopPropagation();
-  };
+  }, [isMaximized]);
 
-  const onHide = (e: React.MouseEvent) => {
+  const onHide = useCallback((e: React.MouseEvent) => {
     setIsVisible(false);
     e.preventDefault();
     e.stopPropagation();
-  };
+  }, [setIsVisible]);
 
-  const suspendIframe = () => {
+  const suspendIframe = useCallback(() => {
     const iframes = document.getElementsByTagName("iframe")
     for (const iframe of iframes) {
       iframe.style.pointerEvents = 'none';
     }
-  }
+  }, []);
 
-  const resumeIframe = () => {
+  const resumeIframe = useCallback(() => {
     const iframes = document.getElementsByTagName("iframe")
     for (const iframe of iframes) {
       iframe.style.pointerEvents = 'auto';
     }
-  }
+  }, []);
 
   return (
     <div
       onMouseDown={handleWindowClick}
       style={{
-        zIndex: getZIndex(windowId),
+        zIndex: getZIndex(windowId.current),
         position: 'fixed',
         visibility: !isVisible ? 'hidden' : undefined,
       }}>

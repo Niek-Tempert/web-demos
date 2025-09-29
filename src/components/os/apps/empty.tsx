@@ -1,8 +1,6 @@
-import Window from "../window/window";
-
-export default function form() {
+export default function Empty() {
     return (
-        <Window title='⬛ Empty' position={{ x: 100, y: 50 }}>
-        </Window>
+        <>
+        </>
     );
 }

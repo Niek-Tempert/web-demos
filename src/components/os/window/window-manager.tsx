@@ -1,52 +1,57 @@
 "use client"
 import React, { createContext, useContext, useState, useCallback, useId } from 'react';
+import Window from './window';
+
+interface WindowInitProps {
+  title?: string;
+  children: React.ReactNode
+}
 
 interface WindowContextType {
   startWindow: (data: { children: React.ReactNode }) => number;
-  focusWindow: (index: number) => void;
-  bringToFront: (windowId: string) => void;
-  getZIndex: (windowId: string) => number;
+  bringToFront: (windowID: number) => void;
+  getZIndex: (windowID: number) => number;
 }
 
 const WindowContext = createContext<WindowContextType | null>(null);
 
 export function WindowManager({ children }: { children?: React.ReactNode }) {
   const [windows, setWindows] = useState<React.ReactNode[]>([]);
-  const [windowOrder, setWindowOrder] = useState<string[]>([]);
+  const [windowOrder, setWindowOrder] = useState<number[]>([]);
   const baseZIndex = 1000;
 
-  const startWindow = useCallback(({ children }: { children: React.ReactNode }) => {
-    setWindows(prev => {
-      return [...prev, children];
-    });
-
-    return windows.length; // TODO: Fix
-  }, [windows, setWindows]);
-
-  const focusWindow = useCallback((index: number) => {
-    // windows[index];
-  }, []);
-
-  const bringToFront = useCallback((windowId: string) => {
+  const bringToFront = useCallback((windowID: number) => {
     setWindowOrder(prev => {
-      const filtered = prev.filter(id => id !== windowId);
-      return [...filtered, windowId];
+      const filtered = prev.filter(id => id !== windowID);
+      return [...filtered, windowID];
     });
   }, []);
 
-  const getZIndex = useCallback((windowId: string) => {
-    const index = windowOrder.indexOf(windowId);
+  const getZIndex = useCallback((windowID: number) => {
+    const index = windowOrder.indexOf(windowID);
     return index === -1 ? baseZIndex : baseZIndex + index + 1;
-  }, [windowOrder, baseZIndex]);
+  }, [windowOrder]);
+
+  const startWindow = useCallback(({ title, children }: WindowInitProps) => {
+    const windowID = windows.length;
+    const newWindow = (
+      <Window title={title} id={windowID} key={windowID}>
+        {children}
+      </Window>
+    );
+
+    setWindows(prev => {
+      return [...prev, newWindow];
+    });
+    bringToFront(windowID);
+
+    return windowID;
+  }, [windows, bringToFront]);
 
   return (
-    <WindowContext.Provider value={{ startWindow, focusWindow, bringToFront, getZIndex }}>
-      {windows.map((window, index) => {
-        return (
-          <div key={index}>
-            {window}
-          </div>
-        );
+    <WindowContext.Provider value={{ startWindow, bringToFront, getZIndex }}>
+      {windows.map((window, _) => {
+        return window;
       })}
       {children}
     </WindowContext.Provider>

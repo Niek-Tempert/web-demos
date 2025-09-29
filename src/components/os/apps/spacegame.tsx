@@ -1,8 +1,6 @@
-import Window from "../window/window";
 
 export default function SpaceGame() {
     return (
-        <Window title='🚀 SpaceGame' position={{ x: 800, y: 300 }}>
         <iframe
             src="./spacegame/index.html"
             style={{
@@ -10,6 +8,5 @@ export default function SpaceGame() {
                 height: '100%',
                 margin: 'auto'
             }} />
-        </Window>
     );
 }
