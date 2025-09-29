@@ -163,6 +163,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         this.setState({
             position: position,
         })
+        this.props.onMove?.(e, position);
     }
 
     render(): React.ReactNode {
