@@ -1,9 +1,10 @@
-import { Minus, Copy, X } from "lucide-react";
+import { Minus, Copy, X, Square } from "lucide-react";
 import { RefObject } from "react";
 
 interface WindowTitleBarProps {
     title?: string;
     ref?: RefObject<HTMLDivElement | null>;
+    isMaximized?: boolean;
     onMinimize?: (e: React.MouseEvent) => void;
     onMaximize?: (e: React.MouseEvent) => void;
     onClose?: (e: React.MouseEvent) => void;
@@ -12,6 +13,7 @@ interface WindowTitleBarProps {
 export default function WindowTitleBar({
     title = "Window",
     ref,
+    isMaximized = false,
     onMinimize,
     onMaximize,
     onClose,
@@ -59,7 +61,9 @@ export default function WindowTitleBar({
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
-                <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />
+                {isMaximized
+                    ? <Square style={{ scale: 0.5 }} />
+                    : <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />}
             </div>
             <div
                 className='window-close-btn'

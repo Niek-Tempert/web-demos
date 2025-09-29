@@ -5,15 +5,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <html lang="en" suppressHydrationWarning>
-        <head />
+        <head>
+          <link rel="shortcut icon" href="door.svg" />
+        </head>
         <body>
           <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
           </ThemeProvider>
         </body>
       </html>

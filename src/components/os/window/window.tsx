@@ -97,7 +97,7 @@ export default function Window({
             width: '100%',
             height: '100%',
             background: '#1F1F23',
-            border: '1px solid #464647',
+            border: !isMaximized ? '1px solid #464647' : undefined,
             borderRadius: !isMaximized ? 10 : 0,
             overflow: 'hidden',
             display: 'flex',
@@ -108,7 +108,8 @@ export default function Window({
             onMaximize={onMaximize}
             onClose={onHide}
             ref={titleBarRef}
-            title={title} />
+            title={title} 
+            isMaximized={isMaximized}/>
           <div
             style={{
               flex: 1,
