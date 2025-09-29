@@ -32,14 +32,15 @@ export default function Window({
   }, [bringToFront]);
 
   const onMove = useCallback((e: MouseEvent, position: Vec2) => {
-    if (isMaximized) return;
+    if (isMaximized) {
+      setIsMaximized(false);
+    };
     setCurrentPosition(position);
   }, [isMaximized]);
 
   const onResize = useCallback((e: PointerEvent, size: Size) => {
-    if (isMaximized) return;
     setCurrentSize(size);
-  }, [isMaximized]);
+  }, []);
 
   const onMaximize = useCallback(() => {
     setIsMaximized(!isMaximized);
@@ -72,7 +73,6 @@ export default function Window({
         visibility: !getIsVisible(windowID.current) ? 'hidden' : undefined,
       }}>
       <MovableResizeable
-        canDrag={!isMaximized}
         canResize={!isMaximized}
         onMove={onMove}
         onResize={onResize}

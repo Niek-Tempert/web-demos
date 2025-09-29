@@ -62,8 +62,8 @@ export default function WindowTitleBar({
                     justifyContent: 'center',
                 }}>
                 {isMaximized
-                    ? <Square style={{ scale: 0.5 }} />
-                    : <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />}
+                    ? <Copy style={{ scale: 0.5, transform: 'rotate(90deg)' }} />
+                    : <Square style={{ scale: 0.5 }} />}
             </div>
             <div
                 className='window-close-btn'
