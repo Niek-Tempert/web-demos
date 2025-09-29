@@ -1,5 +1,5 @@
 "use client"
-import React, { createContext, useContext, useState, useCallback, useId } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import Window from './window';
 
 interface WindowInitProps {
