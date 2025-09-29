@@ -10,7 +10,10 @@ interface WindowInitProps {
 interface WindowContextType {
   startWindow: (data: { children: React.ReactNode }) => number;
   bringToFront: (windowID: number) => void;
+  minimize: (windowID: number) => void;
+  focus: (windowID: number) => void;
   getZIndex: (windowID: number) => number;
+  getIsVisible: (windowID: number) => boolean;
 }
 
 const WindowContext = createContext<WindowContextType | null>(null);
@@ -18,6 +21,7 @@ const WindowContext = createContext<WindowContextType | null>(null);
 export function WindowManager({ children }: { children?: React.ReactNode }) {
   const [windows, setWindows] = useState<React.ReactNode[]>([]);
   const [windowOrder, setWindowOrder] = useState<number[]>([]);
+  const [minimized, setMinimized] = useState<number[]>([]);
   const baseZIndex = 1000;
 
   const bringToFront = useCallback((windowID: number) => {
@@ -27,10 +31,29 @@ export function WindowManager({ children }: { children?: React.ReactNode }) {
     });
   }, []);
 
+  const minimize = useCallback((windowID: number) => {
+    setMinimized(prev => {
+      const filtered = prev.filter(id => id !== windowID);
+      return [...filtered, windowID];
+    });
+  }, []);
+
+  const focus = useCallback((windowID: number) => {
+    setMinimized(prev => {
+      const filtered = prev.filter(id => id !== windowID);
+      return [...filtered];
+    });
+    bringToFront(windowID);
+  }, [bringToFront]);
+
   const getZIndex = useCallback((windowID: number) => {
     const index = windowOrder.indexOf(windowID);
     return index === -1 ? baseZIndex : baseZIndex + index + 1;
   }, [windowOrder]);
+
+  const getIsVisible = useCallback((windowID: number) => {
+    return !minimized.includes(windowID);
+  }, [minimized]);
 
   const startWindow = useCallback(({ title, children }: WindowInitProps) => {
     const windowID = windows.length;
@@ -49,7 +72,7 @@ export function WindowManager({ children }: { children?: React.ReactNode }) {
   }, [windows, bringToFront]);
 
   return (
-    <WindowContext.Provider value={{ startWindow, bringToFront, getZIndex }}>
+    <WindowContext.Provider value={{ startWindow, bringToFront, minimize, focus, getZIndex, getIsVisible }}>
       {windows.map((window, _) => {
         return window;
       })}

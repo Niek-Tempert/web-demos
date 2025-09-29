@@ -5,7 +5,7 @@ import Form from "./apps/form";
 import { useCallback } from "react";
 
 export default function Desktop() {
-    const { startWindow, bringToFront } = useWindowManager();
+    const { startWindow, focus } = useWindowManager();
 
     const handleStartWindow = useCallback((e: React.MouseEvent, content: React.ReactNode) => {
         if (!(e.target instanceof HTMLElement)) return;
@@ -21,8 +21,8 @@ export default function Desktop() {
             return;
         }
 
-        bringToFront(windowIndex);
-    }, [startWindow, bringToFront]);
+        focus(windowIndex);
+    }, [startWindow, focus]);
 
     return (
         <>

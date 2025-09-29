@@ -1,10 +1,9 @@
 'use client'
 import { useWindowManager } from '@/components/os/window/window-manager';
 import { Size, Vec2 } from '@/Types/Vector';
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import WindowTitleBar from './window-title-bar';
 import MovableResizeable from '../../movable/movable-resizeable';
-import { ExternalCallback, useExternal } from '@/Types/Hooks';
 
 interface WindowProps {
   children?: React.ReactNode;
@@ -12,7 +11,6 @@ interface WindowProps {
   title?: string;
   position?: Vec2;
   size?: Size;
-  visibilityCallback?: ExternalCallback<boolean>;
 }
 
 export default function Window({
@@ -21,20 +19,16 @@ export default function Window({
   title = "Window",
   position = { x: 100, y: 100 },
   size = { width: 1000, height: 600 },
-  visibilityCallback = [true, () => { }]
 }: WindowProps) {
-  const windowId = useRef(id);
-  const { bringToFront, getZIndex } = useWindowManager();
+  const windowID = useRef(id);
+  const { bringToFront, minimize, getZIndex, getIsVisible } = useWindowManager();
   const [currentPosition, setCurrentPosition] = useState(position);
   const [currentSize, setCurrentSize] = useState(size);
   const [isMaximized, setIsMaximized] = useState(false);
-
-  const [isVisible, setIsVisible] = useExternal(visibilityCallback);
-
   const titleBarRef = useRef<HTMLDivElement>(null);
 
   const handleWindowClick = useCallback(() => {
-    bringToFront(windowId.current);
+    bringToFront(windowID.current);
   }, [bringToFront]);
 
   const onMove = useCallback((e: MouseEvent, position: Vec2) => {
@@ -47,17 +41,13 @@ export default function Window({
     setCurrentSize(size);
   }, [isMaximized]);
 
-  const onMaximize = useCallback((e: React.MouseEvent) => {
+  const onMaximize = useCallback(() => {
     setIsMaximized(!isMaximized);
-    e.preventDefault();
-    e.stopPropagation();
   }, [isMaximized]);
 
-  const onHide = useCallback((e: React.MouseEvent) => {
-    setIsVisible(false);
-    e.preventDefault();
-    e.stopPropagation();
-  }, [setIsVisible]);
+  const onMinimize = useCallback(() => {
+    minimize(windowID.current);
+  }, [minimize]);
 
   const suspendIframe = useCallback(() => {
     const iframes = document.getElementsByTagName("iframe")
@@ -77,9 +67,9 @@ export default function Window({
     <div
       onMouseDown={handleWindowClick}
       style={{
-        zIndex: getZIndex(windowId.current),
+        zIndex: getZIndex(windowID.current),
         position: 'fixed',
-        visibility: !isVisible ? 'hidden' : undefined,
+        visibility: !getIsVisible(windowID.current) ? 'hidden' : undefined,
       }}>
       <MovableResizeable
         canDrag={!isMaximized}
@@ -106,9 +96,9 @@ export default function Window({
             flexDirection: 'column',
           }}>
           <WindowTitleBar
-            onMinimize={onHide}
+            onMinimize={onMinimize}
             onMaximize={onMaximize}
-            onClose={onHide}
+            onClose={onMinimize}
             ref={titleBarRef}
             title={title} 
             isMaximized={isMaximized}/>
