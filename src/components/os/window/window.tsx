@@ -4,6 +4,7 @@ import { Size, Vec2 } from '@/Types/Vector';
 import { useCallback, useRef, useState } from 'react';
 import WindowTitleBar from './window-title-bar';
 import MovableResizeable from '../../movable/movable-resizeable';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WindowProps {
   children?: React.ReactNode;
@@ -28,6 +29,7 @@ export default function Window({
   const [currentSize, setCurrentSize] = useState(size);
   const [isMaximized, setIsMaximized] = useState(maximized);
   const titleBarRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const handleWindowClick = useCallback(() => {
     bringToFront(windowID.current);
@@ -75,6 +77,7 @@ export default function Window({
         visibility: !getIsVisible(windowID.current) ? 'hidden' : undefined,
       }}>
       <MovableResizeable
+        canDrag={!(isMobile && isMaximized)}
         canResize={!isMaximized}
         onMove={onMove}
         onResize={onResize}
@@ -102,8 +105,8 @@ export default function Window({
             onMaximize={onMaximize}
             onClose={onMinimize}
             ref={titleBarRef}
-            title={title} 
-            isMaximized={isMaximized}/>
+            title={title}
+            isMaximized={isMaximized} />
           <div
             style={{
               flex: 1,

@@ -26,15 +26,15 @@ export default function Desktop() {
 
     return (
         <>
-            <div className="absolute bottom-0 w-full h-10 bg-[#1F1F23] border-t border-[#464647] z-[10000] text-center flex items-center justify-center text-xl">
+            <div className="fixed bottom-0 left-0 right-0 w-full h-10 bg-[#1F1F23] border-t border-[#464647] z-[10000] text-center flex items-center justify-center text-xl">
                 <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Empty />)}>🚪</button>
                 <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <SpaceGame />)}>🚀</button>
                 <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Form />)}>📄</button>
             </div>
             <img
+                className="wallpaper"
                 draggable={false}
                 style={{
-                    width: '100vw',
                     userSelect: 'none'
                 }}
                 src={'./os/wallpaper.webp'}

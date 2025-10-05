@@ -145,6 +145,15 @@
   }
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: fixed; /* Prevents mobile Safari scrolling */
+}
+
 .window-btn:hover {
   background-color: #363639;
 }
@@ -179,4 +188,11 @@
 .taskbar-btn:active {
   border: 1px solid #464647;
   background-color: #4C4C4F;
+}
+
+.wallpaper {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* fills screen, crops excess */
+  object-position: center;
 }
