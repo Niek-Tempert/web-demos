@@ -6,9 +6,9 @@ export interface MovableProps {
     position?: Vec2;
     dragRef?: RefObject<HTMLDivElement | null>;
     canDrag?: boolean;
-    onMove?: (e: MouseEvent, position: Vec2) => void;
-    onMoveStart?: (e: MouseEvent) => void;
-    onMoveEnd?: (e: MouseEvent) => void;
+    onMove?: (position: Vec2) => void;
+    onMoveStart?: () => void;
+    onMoveEnd?: () => void;
 }
 
 export interface MovableState {
@@ -21,9 +21,9 @@ export interface MovableResizeableProps extends MovableProps {
     size?: Size;
     minSize?: Size;
     canResize?: boolean;
-    onResize?: (e: PointerEvent, size: Size) => void;
-    onResizeStart?: (e: PointerEvent) => void;
-    onResizeEnd?: (e: PointerEvent) => void;
+    onResize?: (size: Size) => void;
+    onResizeStart?: () => void;
+    onResizeEnd?: () => void;
 }
 
 export interface MovableResizeableState {

@@ -33,14 +33,14 @@ export default function Window({
     bringToFront(windowID.current);
   }, [bringToFront]);
 
-  const onMove = useCallback((e: MouseEvent, position: Vec2) => {
+  const onMove = useCallback((position: Vec2) => {
     if (isMaximized) {
       setIsMaximized(false);
     };
     setCurrentPosition(position);
   }, [isMaximized]);
 
-  const onResize = useCallback((e: PointerEvent, size: Size) => {
+  const onResize = useCallback((size: Size) => {
     setCurrentSize(size);
   }, []);
 

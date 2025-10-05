@@ -69,7 +69,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         this.resizeRef.current?.addEventListener('pointermove', this.handleResizeMove);
         this.resizeRef.current?.setPointerCapture(e.pointerId);
 
-        this.props.onResizeStart?.(e.nativeEvent);
+        this.props.onResizeStart?.();
     };
 
     handleResizeMove = (e: PointerEvent) => {
@@ -112,8 +112,8 @@ export default class MovableResizeable extends React.Component<MovableResizeable
             size: newSize,
         });
 
-        this.props.onMove?.(e, newPosition);
-        this.props.onResize?.(e, newSize);
+        this.props.onMove?.(newPosition);
+        this.props.onResize?.(newSize);
     };
     handleResizeUp = (e: React.PointerEvent) => {
         this.setState({
@@ -123,7 +123,7 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         this.resizeRef.current?.removeEventListener('pointermove', this.handleResizeMove);
         this.resizeRef.current?.releasePointerCapture(e.pointerId);
 
-        this.props.onResizeEnd?.(e.nativeEvent);
+        this.props.onResizeEnd?.();
     };
     handleMouseMove = (e: React.MouseEvent) => {
         if (this.state.isResizing) return;
@@ -159,11 +159,11 @@ export default class MovableResizeable extends React.Component<MovableResizeable
         }
     }
 
-    onMove = (e: MouseEvent, position: Vec2) => {
+    onMove = (position: Vec2) => {
         this.setState({
             position: position,
         })
-        this.props.onMove?.(e, position);
+        this.props.onMove?.(position);
     }
 
     render(): React.ReactNode {
