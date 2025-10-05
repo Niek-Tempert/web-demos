@@ -11,6 +11,7 @@ interface WindowProps {
   title?: string;
   position?: Vec2;
   size?: Size;
+  maximized?: boolean;
 }
 
 export default function Window({
@@ -19,12 +20,13 @@ export default function Window({
   title = "Window",
   position = { x: 100, y: 100 },
   size = { width: 1000, height: 600 },
+  maximized = false
 }: WindowProps) {
   const windowID = useRef(id);
   const { bringToFront, minimize, getZIndex, getIsVisible } = useWindowManager();
   const [currentPosition, setCurrentPosition] = useState(position);
   const [currentSize, setCurrentSize] = useState(size);
-  const [isMaximized, setIsMaximized] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(maximized);
   const titleBarRef = useRef<HTMLDivElement>(null);
 
   const handleWindowClick = useCallback(() => {

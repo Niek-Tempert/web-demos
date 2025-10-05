@@ -1,6 +1,7 @@
 "use client"
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import Window from './window';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WindowInitProps {
   title?: string;
@@ -23,6 +24,8 @@ export function WindowManager({ children }: { children?: React.ReactNode }) {
   const [windowOrder, setWindowOrder] = useState<number[]>([]);
   const [minimized, setMinimized] = useState<number[]>([]);
   const baseZIndex = 1000;
+  
+  const isMobile = useIsMobile();
 
   const bringToFront = useCallback((windowID: number) => {
     setWindowOrder(prev => {
@@ -58,7 +61,7 @@ export function WindowManager({ children }: { children?: React.ReactNode }) {
   const startWindow = useCallback(({ title, children }: WindowInitProps) => {
     const windowID = windows.length;
     const newWindow = (
-      <Window title={title} id={windowID} key={windowID}>
+      <Window title={title} id={windowID} key={windowID} maximized={isMobile}>
         {children}
       </Window>
     );
@@ -69,7 +72,7 @@ export function WindowManager({ children }: { children?: React.ReactNode }) {
     bringToFront(windowID);
 
     return windowID;
-  }, [windows, bringToFront]);
+  }, [windows, bringToFront, isMobile]);
 
   return (
     <WindowContext.Provider value={{ startWindow, bringToFront, minimize, focus, getZIndex, getIsVisible }}>
