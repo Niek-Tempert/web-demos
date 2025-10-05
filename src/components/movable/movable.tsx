@@ -22,7 +22,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
         if (this.props.canDrag === false) return;
         if (!e.changedTouches.length) return;
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         this.setState({
             isDragging: true,
@@ -37,7 +37,7 @@ export default class Movable extends React.Component<MovableProps, MovableState>
     handleTouchMove = (e: TouchEvent) => {
         if (!this.state.isDragging) return;
 
-        const touch = e.changedTouches[0];
+        const touch = e.touches[0];
 
         const newPosition = {
             x: touch.clientX - this.state.dragStart.x,
