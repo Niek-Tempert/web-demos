@@ -112,6 +112,7 @@ export default function Window({
               flex: 1,
               overflow: 'auto',
               background: 'black',
+              userSelect: 'text',
             }}>
             {children}
           </div>

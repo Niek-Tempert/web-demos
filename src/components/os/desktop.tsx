@@ -3,6 +3,7 @@ import { useWindowManager } from "./window/window-manager";
 import Empty from "./apps/empty";
 import Form from "./apps/form";
 import { useCallback } from "react";
+import Artstation from "./apps/artstation";
 
 export default function Desktop() {
     const { startWindow, focus } = useWindowManager();
@@ -30,6 +31,8 @@ export default function Desktop() {
                 <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Empty />)}>🚪</button>
                 <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <SpaceGame />)}>🚀</button>
                 <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Form />)}>📄</button>
+                <button className="taskbar-btn" onClick={(e: React.MouseEvent) => handleStartWindow(e, <Artstation />)}>🖌️</button>
+                {/* <a className="taskbar-btn" target="_blank" href="https://www.artstation.com/niektempert">🖌️</a> */}
             </div>
             <img
                 className="wallpaper"
