@@ -1,10 +1,9 @@
 version: '3.8'
 services:
-  app:
-    image: web-demos
+  frontend:
     restart: unless-stopped
     build:
-      context: ./
+      context: ./nextjs-app
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
