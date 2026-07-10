@@ -1,0 +1,3 @@
+[submodule "public/spacegame"]
+	path = public/spacegame
+	url = https://github.com/Niek-Tempert/Web-Demo-Rust.git
